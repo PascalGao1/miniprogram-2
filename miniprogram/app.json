@@ -1,8 +1,9 @@
 {
   "pages": [
     "pages/test/test",
-    "pages/index/index"
-    
+    "pages/index/index",
+    "pages/home/login",
+    "pages/home/index/index"
   ],
   "window": {
     "navigationStyle": "custom"
