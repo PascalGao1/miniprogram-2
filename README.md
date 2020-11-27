@@ -1,7 +1,7 @@
 # 微信小程序开发课程设计  
 ## 数据库设计
 ### Student_Info（学生个人基本信息）
-openID, student_name, studentID, gender, phone_num, origin_college, origin_major, if_agree_downgrade, graduation_choice, if_will_doctor
+openID, student_name, studentID, gender, identity_num, phone_num, origin_college, origin_major, if_agree_downgrade, graduation_choice, if_will_doctor, total_not_learned_credits
 ### Course_Info（课程基本信息）
 course_orderID, courseID, course_name, college, credit, semester
 ### Learn_Info（学生课程修读信息）
