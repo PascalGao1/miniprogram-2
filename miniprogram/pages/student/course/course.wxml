@@ -1,0 +1,41 @@
+<view class="container">
+	<view class="inner" wx:if="{{step==1}}">
+		<view>个人信息填写</view>
+		<view class="flex solid-bottom padding justify-center">
+			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
+		</view>
+
+	</view>
+	<view class="inner" wx:if="{{step==2}}">
+		<view class="padding flex flex-direction">
+			<button class="cu-btn bg-blue margin-tb-sm lg" bindtap="getCourse_info">获得表格</button>
+		</view>
+		<view class="bg-white padding-lr">
+			<view class="solids-bottom padding-xs flex align-center" wx:for="{{course_info}}" wx:for-item="course" wx:for-index="index">
+				<view class="flex-sub text-center">
+					<view class="flex solid-bottom padding justify-start">{{course.name}} {{course.credit}}</view>
+				</view>
+				<switch class="sm margin-right-sm" bindchange="SetLearned" checked="{{learned[index].if_learned}}" data-credit='{{course.credit}}'></switch>
+			</view>
+		</view>
+
+		<view class="padding bg-white ">
+			<progress percent="{{percent}}" stroke-width='8' activeColor="#10AEFF" border-radius="30" show-info></progress>
+		</view>
+
+		<view class="padding flex flex-direction">
+			<button class="cu-btn bg-blue margin-tb-sm lg" bindtap="getCredit">得分</button>
+		</view>
+		<view class="flex solid-bottom padding justify-around">
+			<button class="cu-btn round bg-blue" bindtap="prevStep">上一步</button>
+			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
+		</view>
+	</view>
+	<view class="inner" wx:if="{{step==3}}">
+		<view>相关证书上传</view>
+		<view class="flex solid-bottom padding justify-around">
+			<button class="cu-btn round bg-blue" bindtap="prevStep">上一步</button>
+			<button class="cu-btn round bg-blue">提交</button>
+		</view>
+	</view>
+</view>

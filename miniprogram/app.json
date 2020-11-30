@@ -1,9 +1,7 @@
 {
   "pages": [
-    "pages/test/test",
-    "pages/index/index",
-    "pages/home/login",
-    "pages/home/index/index"
+    "pages/student/course/course",
+    "pages/test/test"
   ],
   "window": {
     "navigationStyle": "custom"
