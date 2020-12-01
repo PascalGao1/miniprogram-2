@@ -2,55 +2,36 @@ const app= getApp()
 Page({
   data: {
     step:1,
-    course_info:[
-      {
-        name:"大学生英语",
-        credit:2,
-      },
-      {
-        name:"微积分1-1",
-        credit:5,
-      }
-    ],
-    learned:[
-      {
-        course_orderID:1,
-        if_learned:false
-      },
-      {
-        course_orderID:2,
-        if_learned:false
-      }
-    ],
+    course_info:[],
+    learned:[],
     credits:0,
     percent:0
   },
   onLoad:function(options){
-  },
-
-  getCourse_info: function () {
     const db = wx.cloud.database();
     const temp_Coures=[];
-    db.collection('Course_Info').get({
-      success:function(res){
-        for (let index = 0; index < res.data.length; index++) {
-          const element = res.data[index];
-          temp_Coures.push(element);
+    var total
+    // db.collection('Course_Info').count().then(res=>
+    //   {
+    //     total=res.total
+    //     console.log(total)
+    //   }
+    //   )
+    // console.log(total)
+    // var time = Math.ceil(total/20);
+    for (let index = 0; index < 2; index++) {
+      db.collection('Course_Info').skip(index*20).limit(20).get().then(res=>{
+          res.data.forEach(element => {
+            temp_Coures.push(element)
+          });
         }
-      }
-    })
-    db.collection('Course_Info').skip(20).get({
-      success:function(res){
-        for (let index = 0; index < res.data.length; index++) {
-          const element = res.data[index];
-          temp_Coures.push(element);
-        }
-      }
-    })
-    this.setData({
-      course_info:temp_Coures
-    })
-    console.log(this.data.course_info)
+      )
+    }
+    console.log(temp_Coures)
+    var that =this
+    setTimeout(() => {
+      that.setData({course_info:temp_Coures})
+    }, 1000);
   },
 
   SetLearned:function(e){
@@ -69,11 +50,6 @@ Page({
       percent:Math.floor(100*this.data.credits/46)
     })
   },
-
-  getCredit:function(){
-    console.log(this.data.credits)
-  },
-
   nextStep: function () {
     this.setData({
       step: this.data.step + 1
