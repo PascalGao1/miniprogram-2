@@ -4,7 +4,11 @@
     "pages/test/test"
   ],
   "window": {
-    "navigationStyle": "custom"
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "转专业申报系统",
+    "navigationBarTextStyle": "black"
   },
   "usingComponents": {
     "cu-custom": "/colorui/components/cu-custom"

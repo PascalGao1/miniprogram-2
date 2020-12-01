@@ -12,16 +12,20 @@ App({
         traceUser: true,
       })
     }
-    wx.getSystemInfo({
-      success: e => {
-        this.globalData.StatusBar = e.statusBarHeight;
-        let custom = wx.getMenuButtonBoundingClientRect();
-        this.globalData.Custom = custom;
-        this.globalData.CustomBar = custom.bottom + custom.top - e.statusBarHeight;
+    //获取用户openid
+    wx.cloud.callFunction({
+      name: 'login',
+      data: {},
+      success: res => {
+        console.log('获取用户openid成功')
+        this.globalData.openid = res.result.openid
+      },
+      fail: err => {
+        console.error('获取用户openid失败', err)
       }
     })
   },
   globalData: {
-    userInfo: null,
+    openid:''
   }
 })

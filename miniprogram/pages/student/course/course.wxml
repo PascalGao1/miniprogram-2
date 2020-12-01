@@ -1,4 +1,3 @@
-<cu-custom bgColor="bg-gradual-blue" ><view slot="content">转专业申报系统</view></cu-custom>
 <view class="container">
   <!-- 页面一：填报个人信息 -->
 	<view class="inner" wx:if="{{step==1}}">
@@ -11,11 +10,11 @@
   <!-- 页面二：填写完成课程情况 -->
 	<view class="inner" wx:if="{{step==2}}">
 		<view class="bg-white padding-lr">
-			<view class="solids-bottom padding-xs flex align-center" wx:for="{{course_info}}" wx:for-item="course" wx:for-index="index">
+			<view class="solids-bottom padding-xs flex align-center" wx:for="{{course_info}}" wx:key="course_orderID" wx:for-item="course" wx:for-index="index">
 				<view class="flex-sub text-center">
 					<view class="flex solid-bottom padding justify-start">{{course.course_orderID}} {{course.course_name}} {{course.courseID}} {{course.college}} {{course.credit}} {{course.semester}} </view>
 				</view>
-				<switch class="sm margin-right-sm" bindchange="SetLearned" checked="{{learned[index].if_learned}}" data-credit='{{course.credit}}'></switch>
+				<switch class="sm margin-right-sm" bindchange="SetLearned" checked="{{learned[index].if_learned}}" data-course_orderID='{{course.course_orderID}}' data-credit='{{course.credit}}'></switch>
 			</view>
 		</view>
 		<view class="padding bg-white ">
