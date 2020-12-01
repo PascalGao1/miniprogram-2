@@ -1,13 +1,74 @@
 <view class="container">
-  <!-- 页面一：填报个人信息 -->
+	<!-- 页面一：填报个人信息 -->
 	<view class="inner" wx:if="{{step==1}}">
-		<view>个人信息填写</view>
+		<form>
+			<view class="cu-form-group margin-top">
+				<view class="title">姓名</view>
+				<input placeholder="请输入姓名" bindinput="bindStudentName" type="text"></input>
+			</view>
+			<view class="cu-form-group">
+				<view class="title">学号</view>
+				<input placeholder="请输入学号" bindinput="bindStudentID" bindblur="studentIDBlur" value="{{studentID}}" type="number"></input>
+			</view>
+			<radio-group class="block" bindchange="genderRadioChange">
+				<view class="cu-form-group">
+					<view class="title">性别</view>
+					<view>
+						<radio class="red" value="男"></radio>男
+						<radio class="red" value="女"></radio>女
+					</view>
+				</view>
+			</radio-group>
+			<view class="cu-form-group">
+				<view class="title">身份证号</view>
+				<input placeholder="请输入身份证号" bindinput="bindIdentityNum" bindblur="identityNumBlur" value="{{identity_num}}" type="idcard"></input>
+			</view>
+			<view class="cu-form-group">
+				<view class="title">电话</view>
+				<input placeholder="请输入电话" bindinput="bindPhoneNum" bindblur="phoneNumBlur" value="{{phone_num}}" type="number"></input>
+			</view>
+			<view class="cu-form-group">
+				<view class="title">原学院</view>
+				<input placeholder="请输入原学院" bindinput="bindOriginCollege" type="text"></input>
+			</view>
+			<view class="cu-form-group">
+				<view class="title">原专业</view>
+				<input placeholder="请输入原专业" bindinput="bindOriginMajor" type="text"></input>
+			</view>
+			<radio-group class="block margin-top" bindchange="ifAgreeDowngradeRadioChange">
+				<view class="cu-form-group">
+					<view class="title">转专业是否同意降级</view>
+					<view>
+						<radio class="red" value="同意"></radio>是
+						<radio class="red" value="不同意"></radio>否
+					</view>
+				</view>
+			</radio-group>
+			<view class="cu-form-group">
+				<view class="title">毕业选择</view>
+				<picker bindchange="graduationChoicePickerChange" value="{{graduationChoiceIndex}}" range="{{graduationChoicePicker}}">
+					<view class="picker">
+						{{graduationChoiceIndex?graduationChoicePicker[graduationChoiceIndex]:"请选择"}}
+					</view>
+				</picker>
+			</view>
+			<radio-group class="block" bindchange="ifWillDoctorRadioChange">
+				<view class="cu-form-group">
+					<view class="title">是否攻读博士</view>
+					<view>
+						<radio class="red" value="是"></radio>是
+						<radio class="red" value="否"></radio>否
+					</view>
+				</view>
+			</radio-group>
+		</form>
 		<view class="flex solid-bottom padding justify-center">
 			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
 		</view>
-
 	</view>
-  <!-- 页面二：填写完成课程情况 -->
+
+
+	<!-- 页面二：填写完成课程情况 -->
 	<view class="inner" wx:if="{{step==2}}">
 		<view class="bg-white padding-lr">
 			<view class="solids-bottom padding-xs flex align-center" wx:for="{{course_info}}" wx:key="course_orderID" wx:for-item="course" wx:for-index="index">
@@ -25,7 +86,9 @@
 			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
 		</view>
 	</view>
-  <!-- 页面三：上传相关证书 -->
+
+	
+	<!-- 页面三：上传相关证书 -->
 	<view class="inner" wx:if="{{step==3}}">
 		<view>相关证书上传</view>
 		<view class="flex solid-bottom padding justify-around">

@@ -1,3 +1,7 @@
 .wx-progress-inner-bar {
   border-radius: 20rpx;
 }
+
+.cu-form-group .title {
+  min-width: calc(4em + 30rpx);
+}
