@@ -1,6 +1,9 @@
 const app = getApp()
 Page({
   data: {
+    //切换页面
+    step: 3,
+
     // 页面1
     student_name: "",
     studentID: "",
@@ -17,8 +20,7 @@ Page({
     graduation_choice: null,
     if_will_doctor: null,
 
-    // 页面2
-    step: 1,
+    // 页面2 
     course_info: [{
         "course_orderID": "1",
         "courseID": "107032030",
@@ -208,14 +210,31 @@ Page({
 
     ],
     credits: 0,
-    percent: 0
+    percent: 0,
+
+    // 页面三
+    otherMaterialImgIndex: null,
+    otherMaterialImgList: []
   },
+
   /* 
    *加载页面同时查询该用户是否已有填报信息
    */
   onLoad: function (options) {
     const db = wx.cloud.database();
     const temp_Coures = [];
+  },
+
+  // 切换页面
+  nextStep: function () {
+    this.setData({
+      step: this.data.step + 1
+    })
+  },
+  prevStep: function () {
+    this.setData({
+      step: this.data.step - 1
+    })
   },
 
   // 页面1
@@ -335,17 +354,47 @@ Page({
       percent: Math.floor(100 * this.data.credits / 46)
     })
   },
-  nextStep: function () {
-    this.setData({
-      step: this.data.step + 1
-    })
-  },
-  prevStep: function () {
-    this.setData({
-      step: this.data.step - 1
-    })
-  },
-  onReady: function () {
 
+  // 页面三
+  ChooseImage() {
+    wx.chooseImage({
+      count: 4, //默认9
+      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album'], //从相册选择
+      success: (res) => {
+        if (this.data.otherMaterialImgList.length != 0) {
+          this.setData({
+            otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
+          })
+        } else {
+          this.setData({
+            otherMaterialImgList: res.tempFilePaths
+          })
+        }
+      }
+    });
+  },
+  ViewImage(e) {
+    wx.previewImage({
+      urls: this.data.otherMaterialImgList,
+      current: e.currentTarget.dataset.url
+    });
+  },
+  DelImg(e) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该证明材料吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          this.data.otherMaterialImgList.splice(e.currentTarget.dataset.otherMaterialImgIndex, 1);
+          this.setData({
+            otherMaterialImgList: this.data.otherMaterialImgList
+          })
+        }
+      }
+    })
   }
+  
 })
