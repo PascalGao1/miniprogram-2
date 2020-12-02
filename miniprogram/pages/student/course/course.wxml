@@ -85,6 +85,9 @@
 				<switch class="sm margin-right-sm" bindchange="SetLearned" checked="{{learned[index].if_learned}}" data-course_orderID='{{course.course_orderID}}' data-credit='{{course.credit}}'></switch>
 			</view>
 		</view>
+		<view class="solid-bottom text-lg padding">
+        <text class="text-grey">已修学分（未修满第一学年课程的70%学分将会强制降级）</text>
+    </view>
 		<view class="padding bg-white ">
 			<progress percent="{{percent}}" stroke-width='12' activeColor="#10AEFF" border-radius="30" show-info></progress>
 		</view>
