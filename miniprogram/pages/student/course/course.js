@@ -18,7 +18,6 @@ Page({
     if_will_doctor: null,
 
     // 页面2
-    openid: '',
     step: 1,
     course_info: [{
         "course_orderID": "1",
@@ -299,7 +298,11 @@ Page({
       },
     ],
     credits: 0,
-    percent: 0
+    percent: 0,
+
+    // 页面三
+    otherMaterialImgIndex: null,
+    otherMaterialImgList: []
   },
   /* 
    *加载页面同时查询该用户是否已有填报信息
@@ -320,6 +323,7 @@ Page({
       }
     })
   },
+
   // 页面1
   bindStudentName: function (e) {
     console.log(e.detail.value)
@@ -334,12 +338,12 @@ Page({
     })
   },
   studentIDBlur: function (e) {
-    if (e.detail.value.length != 13) {
+    if(e.detail.value.length != 13){
       wx.showToast({
         title: '学号位数不正确，请重新输入',
         icon: 'none',
         duration: 500
-      })
+      }) 
       this.setData({
         studentID: null
       })
@@ -358,12 +362,12 @@ Page({
     })
   },
   identityNumBlur: function (e) {
-    if (e.detail.value.length != 18) {
+    if(e.detail.value.length != 18){
       wx.showToast({
         title: '身份证号位数不正确，请重新输入',
         icon: 'none',
         duration: 500
-      })
+      }) 
       this.setData({
         identity_num: null
       })
@@ -376,12 +380,12 @@ Page({
     })
   },
   phoneNumBlur: function (e) {
-    if (e.detail.value.length != 11) {
+    if(e.detail.value.length != 11){
       wx.showToast({
         title: '手机号位数不正确，请重新输入',
         icon: 'none',
         duration: 500
-      })
+      }) 
       this.setData({
         phone_num: null
       })
@@ -504,8 +508,46 @@ Page({
     this.setData({
       step: this.data.step - 1
     })
-  },
-  onReady: function () {
 
+  // 页面三
+  ChooseImage() {
+    wx.chooseImage({
+      count: 4, //默认9
+      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album'], //从相册选择
+      success: (res) => {
+        if (this.data.otherMaterialImgList.length != 0) {
+          this.setData({
+            otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
+          })
+        } else {
+          this.setData({
+            otherMaterialImgList: res.tempFilePaths
+          })
+        }
+      }
+    });
+  },
+  ViewImage(e) {
+    wx.previewImage({
+      urls: this.data.otherMaterialImgList,
+      current: e.currentTarget.dataset.url
+    });
+  },
+  DelImg(e) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该证明材料吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          this.data.otherMaterialImgList.splice(e.currentTarget.dataset.otherMaterialImgIndex, 1);
+          this.setData({
+            otherMaterialImgList: this.data.otherMaterialImgList
+          })
+        }
+      }
+    })
   }
 })

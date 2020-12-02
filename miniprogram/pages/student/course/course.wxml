@@ -62,6 +62,7 @@
 				</view>
 			</radio-group>
 		</form>
+
 		<view class="flex solid-bottom padding justify-center">
 			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
 		</view>
@@ -96,7 +97,28 @@
 
 	<!-- 页面三：上传相关证书 -->
 	<view class="inner" wx:if="{{step==3}}">
-		<view>相关证书上传</view>
+		<view class="cu-bar bg-white margin-top">
+			<view class="action">
+				图片上传
+			</view>
+			<view class="action">
+				{{otherMaterialImgList.length}}/4
+			</view>
+		</view>
+		<view class="cu-form-group">
+			<view class="grid col-4 grid-square flex-sub">
+				<view class="bg-img" wx:for="{{otherMaterialImgList}}" wx:key="{{otherMaterialImgIndex}}" bindtap="ViewImage" data-url="{{otherMaterialImgList[otherMaterialImgIndex]}}">
+					<image src='{{otherMaterialImgList[otherMaterialImgIndex]}}' mode='aspectFill'></image>
+					<view class="cu-tag bg-red" catchtap="DelImg" data-index="{{otherMaterialImgIndex}}">
+						<text class="cuIcon-close"></text>
+					</view>
+				</view>
+				<view class="solids" bindtap="ChooseImage" wx:if="{{otherMaterialImgList.length<4}}">
+					<text class="cuIcon-cameraadd"></text>
+				</view>
+			</view>
+		</view>
+
 		<view class="flex solid-bottom padding justify-around">
 			<button class="cu-btn round bg-blue" bindtap="prevStep">上一步</button>
 			<button class="cu-btn round bg-blue">提交</button>
