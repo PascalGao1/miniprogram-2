@@ -1,4 +1,7 @@
 App({
+  globalData:{
+    openid:''
+  },
   onLaunch: function () {
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
@@ -12,20 +15,5 @@ App({
         traceUser: true,
       })
     }
-    //获取用户openid
-    wx.cloud.callFunction({
-      name: 'login',
-      data: {},
-      success: res => {
-        console.log('获取用户openid成功')
-        this.globalData.openid = res.result.openid
-      },
-      fail: err => {
-        console.error('获取用户openid失败', err)
-      }
-    })
-  },
-  globalData: {
-    openid:''
   }
 })
