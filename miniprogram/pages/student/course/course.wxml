@@ -70,16 +70,22 @@
 
 	<!-- 页面二：填写完成课程情况 -->
 	<view class="inner" wx:if="{{step==2}}">
+		<button bindtap="getLearn_info">学分情况</button>
+			<view class="flex">
+				<view  class="basis-xl bg-white margin-xs padding-sm radius">课程信息</view>
+				<view class="basis-xs bg-white margin-xs padding-sm radius">已修</view>
+			</view>
 		<view class="bg-white padding-lr">
 			<view class="solids-bottom padding-xs flex align-center" wx:for="{{course_info}}" wx:key="course_orderID" wx:for-item="course" wx:for-index="index">
-				<view class="flex-sub text-center">
-					<view class="flex solid-bottom padding justify-start">{{course.course_orderID}} {{course.course_name}} {{course.courseID}} {{course.college}} {{course.credit}} {{course.semester}} </view>
+				<view class="flex-sub text-left">
+					<view>{{course.course_orderID}} {{course.courseID}} {{course.course_name}} </view>
+					<view> {{course.college}} {{course.credit}} {{course.semester}} </view>
 				</view>
 				<switch class="sm margin-right-sm" bindchange="SetLearned" checked="{{learned[index].if_learned}}" data-course_orderID='{{course.course_orderID}}' data-credit='{{course.credit}}'></switch>
 			</view>
 		</view>
 		<view class="padding bg-white ">
-			<progress percent="{{percent}}" stroke-width='8' activeColor="#10AEFF" border-radius="30" show-info></progress>
+			<progress percent="{{percent}}" stroke-width='12' activeColor="#10AEFF" border-radius="30" show-info></progress>
 		</view>
 		<view class="flex solid-bottom padding justify-around">
 			<button class="cu-btn round bg-blue" bindtap="prevStep">上一步</button>
@@ -87,7 +93,7 @@
 		</view>
 	</view>
 
-	
+
 	<!-- 页面三：上传相关证书 -->
 	<view class="inner" wx:if="{{step==3}}">
 		<view>相关证书上传</view>
