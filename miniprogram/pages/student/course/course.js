@@ -1,6 +1,9 @@
 const app = getApp()
 Page({
   data: {
+    // 页面切换
+    step: 1,
+
     // 页面1
     student_name: "",
     studentID: "",
@@ -18,7 +21,6 @@ Page({
     if_will_doctor: null,
 
     // 页面2
-    step: 1,
     course_info: [{
         "course_orderID": "1",
         "courseID": "107032030",
@@ -300,39 +302,39 @@ Page({
     credits: 0,
     percent: 0,
 
-  // 页面3
-  report_card_pdf: "",
-  grade_point: "",
-  grade_4_img: "",
-  grade_4: "",
-  otherMaterialImgList: [],
-  specialMaterialImgList: [],
+    // 页面3
+    report_card_pdf: "",
+    grade_point: "",
+    grade_4_img: "",
+    grade_4: "",
+    otherMaterialImgList: [],
+    specialMaterialImgList: [],
 
-  report_card_pdf_ID: "",
-  grade_4_img_ID: "",
-  other_material_img_ID_i: [],
-  special_material_img_ID_i: [],
+    report_card_pdf_ID: "",
+    grade_4_img_ID: "",
+    other_material_img_ID_i: [],
+    special_material_img_ID_i: [],
   },
 
   /* 
    *加载页面同时查询该用户是否已有填报信息
    */
-    onLoad: function (options) {
-        wx.cloud.callFunction({
-            name: 'login',
-            data: {},
-            success: res => {
-                console.log('获取用户openid成功')
-                app.globalData.openid = res.result.openid
-                this.setData({
-                    openid: app.globalData.openid
-                })
-            },
-            fail: err => {
-                console.error('获取用户openid失败', err)
-            }
+  onLoad: function (options) {
+    wx.cloud.callFunction({
+      name: 'login',
+      data: {},
+      success: res => {
+        console.log('获取用户openid成功')
+        app.globalData.openid = res.result.openid
+        this.setData({
+          openid: app.globalData.openid
         })
-    },
+      },
+      fail: err => {
+        console.error('获取用户openid失败', err)
+      }
+    })
+  },
 
   // 切换页面
   nextStep: function () {
@@ -480,7 +482,7 @@ Page({
    */
   getLearn_info: function () {
     var openID = this.data.openid
-    var that =this
+    var that = this
     if (!openID) {
       console.error("请重新打开小程序")
     } else {
@@ -522,295 +524,294 @@ Page({
     console.log(this.data.percent)
   },
 
-// 页面3
-    // 可信电子成绩单
-    chooseReportCardPdf() {
-        wx.chooseImage({
-            count: 1, //默认9
-            sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album'], //从相册选择
-            success: (res) => {
-                console.log(res.tempFilePaths);
-                this.setData({
-                    report_card_pdf: res.tempFilePaths
-                })
-            }
-        });
-    },
-    viewReportCardPdf(e) {
-        wx.previewImage({
-            urls: this.data.report_card_pdf
-        });
-    },
-    delReportCardPdf(e) {
-        wx.showModal({
-            title: '确认删除',
-            content: '确定要删除该可信电子成绩单吗',
-            cancelText: '取消',
-            confirmText: '确定',
-            success: res => {
-                if (res.confirm) {
-                    this.setData({
-                        report_card_pdf: ""
-                    })
-                }
-            }
-        })
-    },
-    bindGradePoint: function (e) {
-        console.log(e.detail.value)
+  // 页面3
+  // 可信电子成绩单
+  chooseReportCardPdf() {
+    wx.chooseImage({
+      count: 1, //默认9
+      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album'], //从相册选择
+      success: (res) => {
+        console.log(res.tempFilePaths);
         this.setData({
-            grade_point: e.detail.value
+          report_card_pdf: res.tempFilePaths
         })
-    },
+      }
+    });
+  },
+  viewReportCardPdf(e) {
+    wx.previewImage({
+      urls: this.data.report_card_pdf
+    });
+  },
+  delReportCardPdf(e) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该可信电子成绩单吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          this.setData({
+            report_card_pdf: ""
+          })
+        }
+      }
+    })
+  },
+  bindGradePoint: function (e) {
+    console.log(e.detail.value)
+    this.setData({
+      grade_point: e.detail.value
+    })
+  },
 
-    // 四级成绩
-    chooseGrade4Img() {
-        wx.chooseImage({
-            count: 1, //默认9
-            sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album'], //从相册选择
-            success: (res) => {
-                console.log(res.tempFilePaths);
-                this.setData({
-                    grade_4_img: res.tempFilePaths
-                })
-            }
-        });
-    },
-    viewGrade4Img(e) {
-        wx.previewImage({
-            urls: this.data.grade_4_img
-        });
-    },
-    delGrade4Img(e) {
-        wx.showModal({
-            title: '确认删除',
-            content: '确定要删除该四级成绩单吗',
-            cancelText: '取消',
-            confirmText: '确定',
-            success: res => {
-                if (res.confirm) {
-                    this.setData({
-                        grade_4_img: ""
-                    })
-                }
-            }
-        })
-    },
-    bindGrade4: function (e) {
-        console.log(e.detail.value)
+  // 四级成绩
+  chooseGrade4Img() {
+    wx.chooseImage({
+      count: 1, //默认9
+      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album'], //从相册选择
+      success: (res) => {
+        console.log(res.tempFilePaths);
         this.setData({
-            grade_4: e.detail.value
+          grade_4_img: res.tempFilePaths
         })
-    },
-
-    // 其他证明材料
-    chooseOtherMaterialImg() {
-        wx.chooseImage({
-            count: 4, //默认9
-            sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album'], //从相册选择
-            success: (res) => {
-                console.log(res.tempFilePaths);
-                if (this.data.otherMaterialImgList.length != 0) {
-                    this.setData({
-                        otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
-                    })
-                } else {
-                    this.setData({
-                        otherMaterialImgList: res.tempFilePaths
-                    })
-                }
-            }
-        });
-    },
-    viewOtherMaterialImg(e) {
-        wx.previewImage({
-            urls: this.data.otherMaterialImgList,
-            current: e.currentTarget.dataset.url
-        });
-    },
-    delOtherMaterialImg(e) {
-        wx.showModal({
-            title: '确认删除',
-            content: '确定要删除该证明材料吗',
-            cancelText: '取消',
-            confirmText: '确定',
-            success: res => {
-                if (res.confirm) {
-                    console.log(e.currentTarget.dataset.index);
-                    this.data.otherMaterialImgList.splice(e.currentTarget.dataset.index, 1);
-                    this.setData({
-                        otherMaterialImgList: this.data.otherMaterialImgList
-                    })
-                }
-            }
-        })
-    },
-
-    //特长证明材料
-    chooseSpecialMaterialImg() {
-        wx.chooseImage({
-            count: 4, //默认9
-            sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album'], //从相册选择
-            success: (res) => {
-                console.log(res.tempFilePaths);
-                if (this.data.specialMaterialImgList.length != 0) {
-                    this.setData({
-                        specialMaterialImgList: this.data.specialMaterialImgList.concat(res.tempFilePaths)
-                    })
-                } else {
-                    this.setData({
-                        specialMaterialImgList: res.tempFilePaths
-                    })
-                }
-            }
-        });
-    },
-    viewSpecialMaterialImg(e) {
-        wx.previewImage({
-            urls: this.data.specialMaterialImgList,
-            current: e.currentTarget.dataset.url
-        });
-    },
-    delSpecialMaterialImg(e) {
-        wx.showModal({
-            title: '确认删除',
-            content: '确定要删除该证明材料吗',
-            cancelText: '取消',
-            confirmText: '确定',
-            success: res => {
-                if (res.confirm) {
-                    console.log(e.currentTarget.dataset.index);
-                    this.data.specialMaterialImgList.splice(e.currentTarget.dataset.index, 1);
-                    this.setData({
-                        specialMaterialImgList: this.data.specialMaterialImgList
-                    })
-                }
-            }
-        })
-    },
-
-    // 提交时保存图片文件，当上传云服务器到同一路径时则覆盖原文件
-    saveReportCardPdf: function (fileURL) {
-        wx.cloud.uploadFile({
-            cloudPath: this.data.student_name + '-report_card.pdf', // 上传至云端的路径
-            filePath: fileURL[0], // 小程序临时文件路径
-            success: res => {
-                console.log("可信电子成绩单上传成功", res)
-                //返回文件 ID
-                this.setData({
-                    report_card_pdf_ID: res.fileID
-                });
-            },
-            fail: console.error
-        })
-    },
-    saveGrade4Img(fileURL) {
-        wx.cloud.uploadFile({
-            cloudPath: this.data.student_name + '-grade4.jpg', // 上传至云端的路径
-            filePath: fileURL[0], // 小程序临时文件路径
-            success: res => {
-                console.log("四级成绩单上传成功", res)
-                // 返回文件 ID
-                this.setData({
-                    grade_4_img_ID: res.fileID
-                })
-            },
-            fail: console.error
-        })
-    },
-    saveOtherMaterialImg(fileURLList) {
-        for (var i = 1; i <= fileURLList.length; i++) {
-            wx.cloud.uploadFile({
-                cloudPath: this.data.student_name + '-other_material-' + i + '.jpg', // 上传至云端的路径
-                filePath: fileURLList[i - 1], // 小程序临时文件路径
-                success: res => {
-                    console.log("其他证明材料" + fileURLList.length + "份均上传成功", res)
-                    if (this.data.special_material_img_ID_i.length != 0) {
-                        this.setData({
-                            other_material_img_ID_i: this.data.other_material_img_ID_i.concat(res.fileID)
-                        })
-                    } else {
-                        this.setData({
-                            other_material_img_ID_i: res.fileID
-                        })
-                    }
-                },
-                fail: console.error
-            });
+      }
+    });
+  },
+  viewGrade4Img(e) {
+    wx.previewImage({
+      urls: this.data.grade_4_img
+    });
+  },
+  delGrade4Img(e) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该四级成绩单吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          this.setData({
+            grade_4_img: ""
+          })
         }
-    },
-    saveSpecialMaterialImg(fileURLList) {
-        for (var i = 1; i <= fileURLList.length; i++) {
-            wx.cloud.uploadFile({
-                cloudPath: this.data.student_name + '-special_material-' + i + '.jpg', // 上传至云端的路径
-                filePath: fileURLList[i - 1], // 小程序临时文件路径
-                success: res => {
-                    console.log("特长证明材料" + fileURLList.length + "份均上传成功", res)
-                    if (this.data.special_material_img_ID_i.length != 0) {
-                        this.setData({
-                            special_material_img_ID_i: this.data.special_material_img_ID_i.concat(res.fileID)
-                        })
-                    } else {
-                        this.setData({
-                            special_material_img_ID_i: res.fileID
-                        })
-                    }
-                },
-                fail: console.error
-            });
+      }
+    })
+  },
+  bindGrade4: function (e) {
+    console.log(e.detail.value)
+    this.setData({
+      grade_4: e.detail.value
+    })
+  },
+
+  // 其他证明材料
+  chooseOtherMaterialImg() {
+    wx.chooseImage({
+      count: 4, //默认9
+      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album'], //从相册选择
+      success: (res) => {
+        console.log(res.tempFilePaths);
+        if (this.data.otherMaterialImgList.length != 0) {
+          this.setData({
+            otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
+          })
+        } else {
+          this.setData({
+            otherMaterialImgList: res.tempFilePaths
+          })
         }
-    },
-    submitInfo: function () {
-        // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
+      }
+    });
+  },
+  viewOtherMaterialImg(e) {
+    wx.previewImage({
+      urls: this.data.otherMaterialImgList,
+      current: e.currentTarget.dataset.url
+    });
+  },
+  delOtherMaterialImg(e) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该证明材料吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          console.log(e.currentTarget.dataset.index);
+          this.data.otherMaterialImgList.splice(e.currentTarget.dataset.index, 1);
+          this.setData({
+            otherMaterialImgList: this.data.otherMaterialImgList
+          })
+        }
+      }
+    })
+  },
 
-        this.saveReportCardPdf(this.data.report_card_pdf)
-        this.saveGrade4Img(this.data.grade_4_img)
-        this.saveOtherMaterialImg(this.data.otherMaterialImgList)
-        this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
+  //特长证明材料
+  chooseSpecialMaterialImg() {
+    wx.chooseImage({
+      count: 4, //默认9
+      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+      sourceType: ['album'], //从相册选择
+      success: (res) => {
+        console.log(res.tempFilePaths);
+        if (this.data.specialMaterialImgList.length != 0) {
+          this.setData({
+            specialMaterialImgList: this.data.specialMaterialImgList.concat(res.tempFilePaths)
+          })
+        } else {
+          this.setData({
+            specialMaterialImgList: res.tempFilePaths
+          })
+        }
+      }
+    });
+  },
+  viewSpecialMaterialImg(e) {
+    wx.previewImage({
+      urls: this.data.specialMaterialImgList,
+      current: e.currentTarget.dataset.url
+    });
+  },
+  delSpecialMaterialImg(e) {
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除该证明材料吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          console.log(e.currentTarget.dataset.index);
+          this.data.specialMaterialImgList.splice(e.currentTarget.dataset.index, 1);
+          this.setData({
+            specialMaterialImgList: this.data.specialMaterialImgList
+          })
+        }
+      }
+    })
+  },
 
-        console.log(this.data.report_card_pdf_ID + "test")
-        console.log("why")
-        // console.log(this.data.other_material_img_ID_i);
-        // console.log(this.data.special_material_img_ID_i);
-        const db = wx.cloud.database()
-        db.collection("student").add({
-            data: {
-                // 页面1信息
-                student_name: this.data.student_name,
-                studentID: this.data.studentID,
-                gender: this.data.gender,
-                identity_num: this.data.identity_num,
-                phone_num: this.data.phone_num,
-                origin_college: this.data.origin_college,
-                origin_major: this.data.origin_major,
-                if_agree_downgrade: this.data.if_agree_downgrade,
-                graduation_choice: this.data.graduation_choice,
-                if_will_doctor: this.data.if_will_doctor,
-
-                // 页面3信息
-                report_card_pdf_ID: this.data.report_card_pdf_ID,
-                grade_point: this.data.grade_point,
-                grade_4_img_ID: this.data.grade_4_img_ID,
-                grade_4: this.data.grade_4,
-                //other_material_img_ID_i: this.data.other_material_img_ID_i,
-                //special_material_img_ID_i: this.data.special_material_img_ID_i,
-            },
-            // TODO: 页面2信息
-
-            success: res => {
-                console.log(res)
-                wx.showToast({
-                    title: '提交成功',
-                    icon: 'success',
-                    duration: 500
-                })
-
-                // TODO: 跳转回主页面
-            }
+  // 提交时保存图片文件，当上传云服务器到同一路径时则覆盖原文件
+  saveReportCardPdf: function (fileURL) {
+    wx.cloud.uploadFile({
+      cloudPath: this.data.student_name + '-report_card.pdf', // 上传至云端的路径
+      filePath: fileURL[0], // 小程序临时文件路径
+      success: res => {
+        console.log("可信电子成绩单上传成功", res)
+        //返回文件 ID
+        this.setData({
+          report_card_pdf_ID: res.fileID
+        });
+      },
+      fail: console.error
+    })
+  },
+  saveGrade4Img(fileURL) {
+    wx.cloud.uploadFile({
+      cloudPath: this.data.student_name + '-grade4.jpg', // 上传至云端的路径
+      filePath: fileURL[0], // 小程序临时文件路径
+      success: res => {
+        console.log("四级成绩单上传成功", res)
+        // 返回文件 ID
+        this.setData({
+          grade_4_img_ID: res.fileID
         })
+      },
+      fail: console.error
+    })
+  },
+  saveOtherMaterialImg(fileURLList) {
+    for (var i = 1; i <= fileURLList.length; i++) {
+      wx.cloud.uploadFile({
+        cloudPath: this.data.student_name + '-other_material-' + i + '.jpg', // 上传至云端的路径
+        filePath: fileURLList[i - 1], // 小程序临时文件路径
+        success: res => {
+          console.log("其他证明材料" + fileURLList.length + "份均上传成功", res)
+          if (this.data.special_material_img_ID_i.length != 0) {
+            this.setData({
+              other_material_img_ID_i: this.data.other_material_img_ID_i.concat(res.fileID)
+            })
+          } else {
+            this.setData({
+              other_material_img_ID_i: res.fileID
+            })
+          }
+        },
+        fail: console.error
+      });
     }
+  },
+  saveSpecialMaterialImg(fileURLList) {
+    for (var i = 1; i <= fileURLList.length; i++) {
+      wx.cloud.uploadFile({
+        cloudPath: this.data.student_name + '-special_material-' + i + '.jpg', // 上传至云端的路径
+        filePath: fileURLList[i - 1], // 小程序临时文件路径
+        success: res => {
+          console.log("特长证明材料" + fileURLList.length + "份均上传成功", res)
+          if (this.data.special_material_img_ID_i.length != 0) {
+            this.setData({
+              special_material_img_ID_i: this.data.special_material_img_ID_i.concat(res.fileID)
+            })
+          } else {
+            this.setData({
+              special_material_img_ID_i: res.fileID
+            })
+          }
+        },
+        fail: console.error
+      });
+    }
+  },
+  submitInfo: function () {
+    // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
+
+    this.saveReportCardPdf(this.data.report_card_pdf)
+    this.saveGrade4Img(this.data.grade_4_img)
+    this.saveOtherMaterialImg(this.data.otherMaterialImgList)
+    this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
+
+    console.log(this.data.report_card_pdf_ID + " for test")
+    // console.log(this.data.other_material_img_ID_i);
+    // console.log(this.data.special_material_img_ID_i);
+    const db = wx.cloud.database()
+    db.collection("student").add({
+      data: {
+        // 页面1信息
+        student_name: this.data.student_name,
+        studentID: this.data.studentID,
+        gender: this.data.gender,
+        identity_num: this.data.identity_num,
+        phone_num: this.data.phone_num,
+        origin_college: this.data.origin_college,
+        origin_major: this.data.origin_major,
+        if_agree_downgrade: this.data.if_agree_downgrade,
+        graduation_choice: this.data.graduation_choice,
+        if_will_doctor: this.data.if_will_doctor,
+
+        // 页面3信息
+        report_card_pdf_ID: this.data.report_card_pdf_ID,
+        grade_point: this.data.grade_point,
+        grade_4_img_ID: this.data.grade_4_img_ID,
+        grade_4: this.data.grade_4,
+        //other_material_img_ID_i: this.data.other_material_img_ID_i,
+        //special_material_img_ID_i: this.data.special_material_img_ID_i,
+      },
+      // TODO: 页面2信息
+
+      success: res => {
+        console.log(res)
+        wx.showToast({
+          title: '提交成功',
+          icon: 'success',
+          duration: 500
+        })
+
+        // TODO: 跳转回主页面
+      }
+    })
+  }
 })
