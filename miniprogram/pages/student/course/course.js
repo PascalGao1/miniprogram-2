@@ -508,7 +508,7 @@ Page({
     this.setData({
       step: this.data.step - 1
     })
-
+  },
   // 页面三
   ChooseImage() {
     wx.chooseImage({
