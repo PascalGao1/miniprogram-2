@@ -2,23 +2,27 @@
 	<!-- 页面一：填报个人信息 -->
 	<view class="inner" wx:if="{{step==1}}">
 		<form>
-			<view class="cu-form-group margin-top">
-				<view class="title">姓名</view>
-				<input placeholder="请输入姓名" bindinput="bindStudentName" type="text"></input>
-			</view>
-			<view class="cu-form-group">
-				<view class="title">学号</view>
-				<input placeholder="请输入学号" bindinput="bindStudentID" bindblur="studentIDBlur" value="{{studentID}}" type="number"></input>
-			</view>
-			<radio-group class="block" bindchange="genderRadioChange">
+			<radio-group class="block margin-top" bindchange="genderRadioChange">
 				<view class="cu-form-group">
 					<view class="title">性别</view>
-					<view>
-						<radio class="red" value="男"></radio>男
+					<view wx:if="{{gender==\"男\"}}">
+						<radio class="red" value="男" checked="true"></radio>男
 						<radio class="red" value="女"></radio>女
+					</view>
+					<view wx:else>
+						<radio class="red" value="男"></radio>男
+						<radio class="red" value="女" checked="true"></radio>女
 					</view>
 				</view>
 			</radio-group>
+			<view class="cu-form-group">
+				<view class="title">姓名</view>
+				<input placeholder="请输入姓名" bindinput="bindStudentName" value="{{student_name}}" type="text"></input>
+			</view>
+			<view class="cu-form-group">
+				<view class="title">学号</view>
+				<input placeholder="请输入13位学号" bindinput="bindStudentID" bindblur="studentIDBlur" value="{{studentID}}" type="number"></input>
+			</view>
 			<view class="cu-form-group">
 				<view class="title">身份证号</view>
 				<input placeholder="请输入身份证号" bindinput="bindIdentityNum" bindblur="identityNumBlur" value="{{identity_num}}" type="idcard"></input>
@@ -29,18 +33,22 @@
 			</view>
 			<view class="cu-form-group">
 				<view class="title">原学院</view>
-				<input placeholder="请输入原学院" bindinput="bindOriginCollege" type="text"></input>
+				<input placeholder="请输入原学院" bindinput="bindOriginCollege" value="{{origin_college}}" type="text"></input>
 			</view>
 			<view class="cu-form-group">
 				<view class="title">原专业</view>
-				<input placeholder="请输入原专业" bindinput="bindOriginMajor" type="text"></input>
+				<input placeholder="请输入原专业" bindinput="bindOriginMajor" value="{{origin_major}}" type="text"></input>
 			</view>
 			<radio-group class="block margin-top" bindchange="ifAgreeDowngradeRadioChange">
 				<view class="cu-form-group">
 					<view class="title">转专业是否同意降级</view>
-					<view>
-						<radio class="red" value="同意"></radio>是
+					<view wx:if="{{if_agree_downgrade==\"同意\"}}">
+						<radio class="red" value="同意" checked="true"></radio>是
 						<radio class="red" value="不同意"></radio>否
+					</view>
+					<view wx:else>
+						<radio class="red" value="同意"></radio>是
+						<radio class="red" value="不同意" checked="true"></radio>否
 					</view>
 				</view>
 			</radio-group>
@@ -55,16 +63,20 @@
 			<radio-group class="block" bindchange="ifWillDoctorRadioChange">
 				<view class="cu-form-group">
 					<view class="title">是否攻读博士</view>
-					<view>
-						<radio class="red" value="是"></radio>是
+					<view wx:if="{{if_will_doctor==\"是\"}}">
+						<radio class="red" value="是" checked="true"></radio>是
 						<radio class="red" value="否"></radio>否
+					</view>
+					<view wx:else>
+						<radio class="red" value="是"></radio>是
+						<radio class="red" value="否" checked="true"></radio>否
 					</view>
 				</view>
 			</radio-group>
 		</form>
 
 		<view class="flex solid-bottom padding justify-center">
-			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
+			<button class="cu-btn round bg-blue" bindtap="nextStep">下一页</button>
 		</view>
 	</view>
 
@@ -83,39 +95,176 @@
 			<progress percent="{{percent}}" stroke-width='8' activeColor="#10AEFF" border-radius="30" show-info></progress>
 		</view>
 		<view class="flex solid-bottom padding justify-around">
-			<button class="cu-btn round bg-blue" bindtap="prevStep">上一步</button>
-			<button class="cu-btn round bg-blue" bindtap="nextStep">下一步</button>
+			<button class="cu-btn round bg-blue" bindtap="prevStep">上一页</button>
+			<button class="cu-btn round bg-blue" bindtap="nextStep">下一页</button>
 		</view>
 	</view>
 
 
 	<!-- 页面三：上传相关证书 -->
 	<view class="inner" wx:if="{{step==3}}">
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				图片上传
+		<!-- 转专业申报要求提示信息 -->
+		<view class="bg-white">
+			<view class="padding">
+				转专业申报要求如下：
 			</view>
-			<view class="action">
-				{{otherMaterialImgList.length}}/4
+			<view class="padding-left padding-right">
+				a. 必修课平均学分绩点3.40及以上(所有成绩均为第一次考试成绩)；
+			</view>
+			<view class="padding-left padding-right">
+				b. 具有良好的数学、英语（四级考试成绩525以上）基础；
+			</view>
+			<view class="padding-left padding-right">
+				c. 确有专业方面特长的学生可不受此限制（需提交具有代表性的成果，如网络安全相关的发明专利、开发的网络安全相关软件、网络安全相关获奖证书、二名以上网络安全领域专家的推荐信等）。
+			</view>
+			<view class="padding">
+				若不符合a和b，但符合c，可以通过在下面第4项上传相关特长证明材料。
 			</view>
 		</view>
-		<view class="cu-form-group">
-			<view class="grid col-4 grid-square flex-sub">
-				<view class="bg-img" wx:for="{{otherMaterialImgList}}" wx:key="{{otherMaterialImgIndex}}" bindtap="ViewImage" data-url="{{otherMaterialImgList[otherMaterialImgIndex]}}">
-					<image src='{{otherMaterialImgList[otherMaterialImgIndex]}}' mode='aspectFill'></image>
-					<view class="cu-tag bg-red" catchtap="DelImg" data-index="{{otherMaterialImgIndex}}">
-						<text class="cuIcon-close"></text>
+
+		<!-- 可信电子成绩单 -->
+		<view>
+			<view class="cu-bar bg-white margin-top">
+				<view class="action">
+					1、上传可信电子成绩单pdf（必填）
+				</view>
+				<view class="action" wx:if="{{report_card_pdf==\"\"}}">
+					0/1
+				</view>
+				<view class="action" wx:else>
+					1/1
+				</view>
+			</view>
+			<view class="cu-form-group">
+				<view class="grid col-4 grid-square flex-sub">
+					<view class="bg-img" bindtap="viewReportCardPdf" data-url="{{report_card_pdf}}" wx:if="{{report_card_pdf!=\"\"}}">
+						<image src='{{report_card_pdf}}' mode='aspectFill'></image>
+						<view class="cu-tag bg-red" catchtap="delReportCardPdf">
+							<text class="cuIcon-close"></text>
+						</view>
+					</view>
+					<view class="solids" bindtap="chooseReportCardPdf" wx:if="{{report_card_pdf==\"\"}}">
+						<text class="cuIcon-cameraadd"></text>
 					</view>
 				</view>
-				<view class="solids" bindtap="ChooseImage" wx:if="{{otherMaterialImgList.length<4}}">
-					<text class="cuIcon-cameraadd"></text>
+			</view>
+			<view class="bg-white">
+				<view class="padding">
+					说明：成绩单需要含学分绩点，可通过综合教务系统学生端申请
+				</view>
+			</view>
+			<!-- 分割线 -->
+			<view class="divLine"></view>
+			<form>
+				<view class="cu-form-group">
+					<view class="title">必修学分绩点</view>
+					<input placeholder="请输入必修学分绩点" bindinput="bindGradePoint" value="{{grade_point}}" type="text"></input>
+				</view>
+			</form>
+
+			<view class="cu-bar bg-white margin-top">
+				<view class="action">
+					上传四级成绩单图片（必填）
+				</view>
+				<view class="action" wx:if="{{grade_4_img==\"\"}}">
+					0/1
+				</view>
+				<view class="action" wx:else>
+					1/1
+				</view>
+			</view>
+			<view class="cu-form-group">
+				<view class="grid col-4 grid-square flex-sub">
+					<view class="bg-img" bindtap="viewGrade4Img" data-url="{{grade_4_img}}" wx:if="{{grade_4_img!=\"\"}}">
+						<image src='{{grade_4_img}}' mode='aspectFill'></image>
+						<view class="cu-tag bg-red" catchtap="delGrade4Img">
+							<text class="cuIcon-close"></text>
+						</view>
+					</view>
+					<view class="solids" bindtap="chooseGrade4Img" wx:if="{{grade_4_img==\"\"}}">
+						<text class="cuIcon-cameraadd"></text>
+					</view>
+				</view>
+			</view>
+			<view class="bg-white">
+				<view class="padding">
+					说明：可上传成绩单扫描件或网页查分截图
+				</view>
+			</view>
+			<!-- 分割线 -->
+			<view class="divLine"></view>
+			<form>
+				<view class="cu-form-group">
+					<view class="title">四级成绩</view>
+					<input placeholder="请输入四级成绩" bindinput="bindGrade4" value="{{grade_4}}" type="text"></input>
+				</view>
+			</form>
+
+		</view>
+
+		<!-- 其他证明材料 -->
+		<view>
+			<view class="cu-bar bg-white margin-top">
+				<view class="action">
+					上传其他证明材料图片（选填）
+				</view>
+				<view class="action">
+					{{otherMaterialImgList.length}}/4
+				</view>
+			</view>
+			<view class="cu-form-group">
+				<view class="grid col-4 grid-square flex-sub">
+					<view class="bg-img" wx:for="{{otherMaterialImgList}}" wx:key="{{index}}" bindtap="viewOtherMaterialImg" data-url="{{otherMaterialImgList[index]}}">
+						<image src='{{otherMaterialImgList[index]}}' mode='aspectFill'></image>
+						<view class="cu-tag bg-red" catchtap="delOtherMaterialImg" data-index="{{index}}">
+							<text class="cuIcon-close"></text>
+						</view>
+					</view>
+					<view class="solids" bindtap="chooseOtherMaterialImg" wx:if="{{otherMaterialImgList.length<4}}">
+						<text class="cuIcon-cameraadd"></text>
+					</view>
+				</view>
+			</view>
+			<view class="bg-white">
+				<view class="padding">
+					说明：格式必须是图片，且图片中可反映本人大学期间的获奖、学术成果、学生工作、社会实践经历等信息
+				</view>
+			</view>
+		</view>
+
+		<!-- 特长证明材料 -->
+		<view>
+			<view class="cu-bar bg-white margin-top">
+				<view class="action">
+					上传特长证明材料图片（选填）
+				</view>
+				<view class="action">
+					{{specialMaterialImgList.length}}/4
+				</view>
+			</view>
+			<view class="cu-form-group">
+				<view class="grid col-4 grid-square flex-sub">
+					<view class="bg-img" wx:for="{{specialMaterialImgList}}" wx:key="{{index}}" bindtap="viewSpecialMaterialImg" data-url="{{specialMaterialImgList[index]}}">
+						<image src='{{specialMaterialImgList[index]}}' mode='aspectFill'></image>
+						<view class="cu-tag bg-red" catchtap="delSpecialMaterialImg" data-index="{{index}}">
+							<text class="cuIcon-close"></text>
+						</view>
+					</view>
+					<view class="solids" bindtap="chooseSpecialMaterialImg" wx:if="{{specialMaterialImgList.length<4}}">
+						<text class="cuIcon-cameraadd"></text>
+					</view>
+				</view>
+			</view>
+			<view class="bg-white">
+				<view class="padding">
+					说明：若不符合转专业要求的（1）和（2）项，但符合第（3）项，可以通过这里上传图片格式的获奖证书、推荐信等证明材料。
 				</view>
 			</view>
 		</view>
 
 		<view class="flex solid-bottom padding justify-around">
-			<button class="cu-btn round bg-blue" bindtap="prevStep">上一步</button>
-			<button class="cu-btn round bg-blue">提交</button>
+			<button class="cu-btn round bg-blue" bindtap="prevStep">上一页</button>
+			<button class="cu-btn round bg-blue" bindtap="submitInfo">提交</button>
 		</view>
 	</view>
 </view>

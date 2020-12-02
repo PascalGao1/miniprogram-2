@@ -5,3 +5,10 @@
 .cu-form-group .title {
   min-width: calc(4em + 30rpx);
 }
+
+/*分割线样式*/
+.divLine {
+  background: #E0E3DA;
+  width: 100%;
+  height: 5rpx;
+}
