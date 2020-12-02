@@ -71,7 +71,7 @@
 
 	<!-- 页面二：填写完成课程情况 -->
 	<view class="inner" wx:if="{{step==2}}">
-		<button bindtap="getLearn_info">学分情况</button>
+		<button class="floatbutton" bindtap="getLearn_info">查</button>
 			<view class="flex">
 				<view  class="basis-xl bg-white margin-xs padding-sm radius">课程信息</view>
 				<view class="basis-xs bg-white margin-xs padding-sm radius">已修</view>

@@ -5,3 +5,17 @@
 .cu-form-group .title {
   min-width: calc(4em + 30rpx);
 }
+
+.floatbutton{
+  position: fixed;
+  bottom: 4rem;
+  left: 2rem;
+  width:3rem;
+  height: 3rem;
+  border-radius: 30rem;
+  background-color: dodgerblue;
+  text-align:left;
+  opacity: 1;
+  box-shadow: 5px 5px 20px 5px rgba(56, 56, 52, 0.5);
+  z-index: 10;
+}
