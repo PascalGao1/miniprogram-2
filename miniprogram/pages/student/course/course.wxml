@@ -173,7 +173,7 @@
 
 			<view class="cu-bar bg-white margin-top">
 				<view class="action">
-					上传四级成绩单图片（必填）
+					2、上传四级成绩单图片（必填）
 				</view>
 				<view class="action" wx:if="{{grade_4_img==\"\"}}">
 					0/1
@@ -215,7 +215,7 @@
 		<view>
 			<view class="cu-bar bg-white margin-top">
 				<view class="action">
-					上传其他证明材料图片（选填）
+					3、上传其他证明材料图片（选填）
 				</view>
 				<view class="action">
 					{{otherMaterialImgList.length}}/4
@@ -245,7 +245,7 @@
 		<view>
 			<view class="cu-bar bg-white margin-top">
 				<view class="action">
-					上传特长证明材料图片（选填）
+					4、上传特长证明材料图片（选填）
 				</view>
 				<view class="action">
 					{{specialMaterialImgList.length}}/4

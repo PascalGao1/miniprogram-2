@@ -4,6 +4,9 @@ Page({
     // 页面切换
     step: 1,
 
+    //用户识别
+    openid: '',
+
     // 页面1
     student_name: "",
     studentID: "",
@@ -326,6 +329,7 @@ Page({
       success: res => {
         console.log('获取用户openid成功')
         app.globalData.openid = res.result.openid
+        console.log(res.result.openid)
         this.setData({
           openid: app.globalData.openid
         })
@@ -516,12 +520,6 @@ Page({
         }
       })
     }
-  },
-
-  consoleinfo: function () {
-    console.log(this.data.learned)
-    console.log(this.data.credits)
-    console.log(this.data.percent)
   },
 
   // 页面3
@@ -766,52 +764,106 @@ Page({
       });
     }
   },
+
+  //判断是否满足提交条件
+  judge: function () {
+    //必修成绩单
+    const grade_point = this.data.grade_point
+    const report_card_pdf = this.data.report_card_pdf
+    //四级成绩单
+    const grade_4 = this.data.grade_4
+    const grade_4_img = this.data.grade_4_img
+    //特长证明材料
+    const specialMaterialImgList = this.data.specialMaterialImgList
+
+    if (!specialMaterialImgList) {
+      //没有特长材料，并且没有成绩证明或者四级证明
+      if (!report_card_pdf || !grade_4_img) {
+        return false
+      }
+      //具备必要条件
+      else if (grade_point >= 3.40 && grade_4 >= 525) {
+        return true
+      }
+    }
+    //没有必要证明，但是有特长证明材料 
+    else {
+      return true
+    }
+  },
   submitInfo: function () {
     // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
-
-    this.saveReportCardPdf(this.data.report_card_pdf)
-    this.saveGrade4Img(this.data.grade_4_img)
-    this.saveOtherMaterialImg(this.data.otherMaterialImgList)
-    this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
-
-    console.log(this.data.report_card_pdf_ID + " for test")
-    // console.log(this.data.other_material_img_ID_i);
-    // console.log(this.data.special_material_img_ID_i);
-    const db = wx.cloud.database()
-    db.collection("student").add({
-      data: {
-        // 页面1信息
-        student_name: this.data.student_name,
-        studentID: this.data.studentID,
-        gender: this.data.gender,
-        identity_num: this.data.identity_num,
-        phone_num: this.data.phone_num,
-        origin_college: this.data.origin_college,
-        origin_major: this.data.origin_major,
-        if_agree_downgrade: this.data.if_agree_downgrade,
-        graduation_choice: this.data.graduation_choice,
-        if_will_doctor: this.data.if_will_doctor,
-
-        // 页面3信息
-        report_card_pdf_ID: this.data.report_card_pdf_ID,
-        grade_point: this.data.grade_point,
-        grade_4_img_ID: this.data.grade_4_img_ID,
-        grade_4: this.data.grade_4,
-        //other_material_img_ID_i: this.data.other_material_img_ID_i,
-        //special_material_img_ID_i: this.data.special_material_img_ID_i,
-      },
-      // TODO: 页面2信息
-
-      success: res => {
-        console.log(res)
-        wx.showToast({
-          title: '提交成功',
-          icon: 'success',
-          duration: 500
+    if (!this.judge()) {
+      console.log("不满足提交条件")
+      return
+    } else {
+      //学分未修满70%将会降级
+      if (this.data.percent<70) {
+        this.setData({
+          if_agree_downgrade:true
         })
-
-        // TODO: 跳转回主页面
       }
-    })
-  }
+      this.saveReportCardPdf(this.data.report_card_pdf)
+      this.saveGrade4Img(this.data.grade_4_img)
+      this.saveOtherMaterialImg(this.data.otherMaterialImgList)
+      this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
+
+      console.log(this.data.report_card_pdf_ID + " for test")
+      // console.log(this.data.other_material_img_ID_i);
+      // console.log(this.data.special_material_img_ID_i);
+      const db = wx.cloud.database()
+      db.collection("student").add({
+        data: {
+          // 页面1信息
+          student_name: this.data.student_name,
+          studentID: this.data.studentID,
+          gender: this.data.gender,
+          identity_num: this.data.identity_num,
+          phone_num: this.data.phone_num,
+          origin_college: this.data.origin_college,
+          origin_major: this.data.origin_major,
+          if_agree_downgrade: this.data.if_agree_downgrade,
+          graduation_choice: this.data.graduation_choice,
+          if_will_doctor: this.data.if_will_doctor,
+
+          // 页面3信息
+          report_card_pdf_ID: this.data.report_card_pdf_ID,
+          grade_point: this.data.grade_point,
+          grade_4_img_ID: this.data.grade_4_img_ID,
+          grade_4: this.data.grade_4,
+          //other_material_img_ID_i: this.data.other_material_img_ID_i,
+          //special_material_img_ID_i: this.data.special_material_img_ID_i,
+        },
+        success: res => {
+          console.log(res)
+          wx.showToast({
+            title: '提交成功',
+            icon: 'success',
+            duration: 500
+          })
+        }
+      })
+      // 页面2信息提交
+      var openID = this.data.openid
+      wx.cloud.callFunction({
+        name: "delLearn_info",
+        data: {
+          openID: openID
+        }
+      })
+
+      var Learn_Info = this.data.learned
+      for (let index = 0; index < Learn_Info.length; index++) {
+        const element = Learn_Info[index];
+        wx.cloud.callFunction({
+          name: "addLearn_info",
+          data: {
+            openID: openID,
+            course_orderID: element.course_orderID,
+            if_learned: element.if_learned
+          }
+        })
+      }
+    }
+  },
 })
