@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 1,
+    step: 3,
 
     //用户识别
     openid: '',
@@ -338,6 +338,10 @@ Page({
         console.error('获取用户openid失败', err)
       }
     })
+    var that = this
+    setTimeout(function () {
+      that.getLearn_info()
+    }, 1500)
   },
 
   // 切换页面
@@ -695,18 +699,23 @@ Page({
 
   // 提交时保存图片文件，当上传云服务器到同一路径时则覆盖原文件
   saveReportCardPdf: function (fileURL) {
+    var tempfile
     wx.cloud.uploadFile({
       cloudPath: this.data.student_name + '-report_card.pdf', // 上传至云端的路径
       filePath: fileURL[0], // 小程序临时文件路径
       success: res => {
         console.log("可信电子成绩单上传成功", res)
-        //返回文件 ID
         this.setData({
           report_card_pdf_ID: res.fileID
-        });
+        })
+        //返回文件 ID
       },
       fail: console.error
     })
+    // return new Promise((resolve,reject)=>{
+
+    // })
+
   },
   saveGrade4Img(fileURL) {
     wx.cloud.uploadFile({
@@ -776,9 +785,14 @@ Page({
     //特长证明材料
     const specialMaterialImgList = this.data.specialMaterialImgList
 
-    if (!specialMaterialImgList) {
+    if (specialMaterialImgList.length == 0) {
       //没有特长材料，并且没有成绩证明或者四级证明
       if (!report_card_pdf || !grade_4_img) {
+        wx.showToast({
+          title: '请完成1、2填写',
+          icon: '',
+          duration: 1800
+        })
         return false
       }
       //具备必要条件
@@ -791,26 +805,53 @@ Page({
       return true
     }
   },
+  chooseifagreedowngrade:function() {
+    wx.showModal({
+      title: '学分未达到70%将会降级',
+      content: '确定要降级吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          return true
+        } else if (res.cancel) {
+          return false
+        }
+      }
+    })
+  },
   submitInfo: function () {
     // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
-    if (!this.judge()) {
+    var judge = this.judge()
+    if (!judge) {
       console.log("不满足提交条件")
       return
     } else {
-      //学分未修满70%将会降级
-      if (this.data.percent<70) {
-        this.setData({
-          if_agree_downgrade:true
-        })
+      //学分未修满70%将会提示是否降级
+      if (this.data.percent < 70) {
+        
+        if(this.chooseifagreedowngrade()){
+          this.setData({
+            if_agree_downgrade:true
+          })
+        }
+        else{
+          return
+        }
       }
-      this.saveReportCardPdf(this.data.report_card_pdf)
+      var that = this
+      this.saveReportCardPdf(that.data.report_card_pdf)
+      //.then((res)=>{
+      //   console.log("fileID"+res)
+      //   this.setData({
+      //     report_card_pdf_ID:res.fileID
+      //   })
+      // })
       this.saveGrade4Img(this.data.grade_4_img)
       this.saveOtherMaterialImg(this.data.otherMaterialImgList)
       this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
 
       console.log(this.data.report_card_pdf_ID + " for test")
-      // console.log(this.data.other_material_img_ID_i);
-      // console.log(this.data.special_material_img_ID_i);
       const db = wx.cloud.database()
       db.collection("student").add({
         data: {
