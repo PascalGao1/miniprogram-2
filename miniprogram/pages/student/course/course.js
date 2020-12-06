@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 1,
+    step: 3,
 
     //用户识别
     openid: '',
@@ -307,7 +307,7 @@ Page({
 
     // 页面3
     report_card_pdf: "",
-    grade_point: "",
+    grade_point:"",
     grade_4_img: "",
     grade_4: "",
     otherMaterialImgList: [],
@@ -346,9 +346,39 @@ Page({
 
   // 切换页面
   nextStep: function () {
-    this.setData({
-      step: this.data.step + 1
-    })
+    //在第二页准备前往第三页
+    if (this.data.step == 2) {
+      if (this.data.percent < 70 && (this.data.if_agree_downgrade == "不同意" ||this.data.if_agree_downgrade == null)) {
+        wx.showModal({
+          title: '学分未达到70%将会降级',
+          content: '确定要降级吗',
+          cancelText: '取消',
+          confirmText: '确定',
+          success: res => {
+            console.log(res)
+            if (res.confirm) {
+              this.setData({
+                step:3,
+                if_agree_downgrade:"同意"
+              })
+            } else if (res.cancel) {
+              this.setData({
+                step:1
+              })
+            }
+          }
+        })
+      }
+      else{
+        this.setData({
+          step: this.data.step + 1
+        })
+      }
+    } else {
+      this.setData({
+        step: this.data.step + 1
+      })
+    }
   },
   prevStep: function () {
     this.setData({
@@ -564,7 +594,6 @@ Page({
     });
   },
   bindGradePoint: function (e) {
-    console.log(e.detail.value)
     this.setData({
       grade_point: e.detail.value
     })
@@ -834,27 +863,36 @@ Page({
 
   //判断是否满足提交条件
   judge: function () {
+    var that = this
     //必修成绩单
-    const grade_point = this.data.grade_point
-    const report_card_pdf = this.data.report_card_pdf
+    const grade_point = parseFloat(that.data.grade_point)
+    const report_card_pdf = that.data.report_card_pdf
     //四级成绩单
-    const grade_4 = this.data.grade_4
-    const grade_4_img = this.data.grade_4_img
+    const grade_4 = parseInt(that.data.grade_4)
+    const grade_4_img = that.data.grade_4_img
     //特长证明材料
-    const specialMaterialImgList = this.data.specialMaterialImgList
+    const specialMaterialImgList = that.data.specialMaterialImgList
 
     if (specialMaterialImgList.length == 0) {
       //没有特长材料，并且没有成绩证明或者四级证明
-      if (!report_card_pdf || !grade_4_img) {
+      if (!report_card_pdf || !grade_4_img || !grade_point || !grade_4) {
         wx.showToast({
-          title: '请完成1、2填写',
+          title: '请完成1、2部分填写',
           icon: 'none',
-          duration: 1800
+          duration: 2500
         })
         return false
       }
-      //具备必要条件
-      else if (grade_point >= 3.40 && grade_4 >= 525) {
+      //具备必要条件但是分数不够
+      else if (grade_point < 3.40 || grade_4 < 525) {
+        wx.showToast({
+          title: '必修学分绩点需不低于3.40，并且四级成绩需不低于525',
+          icon: 'none',
+          duration: 3000
+        })
+        return false
+      }
+      else{
         return true
       }
     }
@@ -863,21 +901,6 @@ Page({
       return true
     }
   },
-  chooseifagreedowngrade: function () {
-    wx.showModal({
-      title: '学分未达到70%将会降级',
-      content: '确定要降级吗',
-      cancelText: '取消',
-      confirmText: '确定',
-      success: res => {
-        if (res.confirm) {
-          return true
-        } else if (res.cancel) {
-          return false
-        }
-      }
-    })
-  },
   submitInfo: function () {
     // 所有填写和上传的资料符合要求才能提交
     var judge = this.judge()
@@ -885,18 +908,6 @@ Page({
       console.log("不满足提交条件")
       return
     } else {
-      //学分未修满70%将会提示是否降级
-      if (this.data.percent < 70) {
-
-        if (this.chooseifagreedowngrade()) {
-          this.setData({
-            if_agree_downgrade: "同意"
-          })
-        } else {
-          return
-        }
-      }
-
       const db = wx.cloud.database()
       // 页面1信息提交
       db.collection("Student_Info").add({
@@ -955,7 +966,6 @@ Page({
           })
         }
       });
-
     }
   }
 })
