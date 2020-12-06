@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 1,
+    step: 3,
 
     //用户识别
     openid: '',
@@ -533,7 +533,8 @@ Page({
         console.log(res.tempFilePaths);
         this.setData({
           report_card_pdf: res.tempFilePaths
-        })
+        });
+        this.saveReportCardPdfID(this.data.report_card_pdf);
       }
     });
   },
@@ -553,9 +554,10 @@ Page({
           this.setData({
             report_card_pdf: ""
           })
+          this.delReportCardPdfID(this.data.report_card_pdf_ID);
         }
       }
-    })
+    });
   },
   bindGradePoint: function (e) {
     console.log(e.detail.value)
@@ -574,7 +576,8 @@ Page({
         console.log(res.tempFilePaths);
         this.setData({
           grade_4_img: res.tempFilePaths
-        })
+        });
+        this.saveGrade4ImgID(this.data.grade_4_img);
       }
     });
   },
@@ -593,7 +596,8 @@ Page({
         if (res.confirm) {
           this.setData({
             grade_4_img: ""
-          })
+          });
+          this.delGrade4ImgID(this.data.grade_4_img_ID);
         }
       }
     })
@@ -616,12 +620,14 @@ Page({
         if (this.data.otherMaterialImgList.length != 0) {
           this.setData({
             otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
-          })
+          });
         } else {
           this.setData({
             otherMaterialImgList: res.tempFilePaths
-          })
+          });
         }
+        this.data.other_material_img_ID_i = [] // 清空，否则重复保存时会在原来的list后面继续添加
+        this.saveOtherMaterialImgIDs(this.data.otherMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的
       }
     });
   },
@@ -643,7 +649,11 @@ Page({
           this.data.otherMaterialImgList.splice(e.currentTarget.dataset.index, 1);
           this.setData({
             otherMaterialImgList: this.data.otherMaterialImgList
-          })
+          });
+          console.log("test   ", this.data.other_material_img_ID_i);
+          this.delOtherMaterialImgIDs(this.data.other_material_img_ID_i); // 删除原来存放的所有图片的fileID
+          this.data.other_material_img_ID_i = [] // 清空，否则会在原来的list后面继续添加
+          this.saveOtherMaterialImgIDs(this.data.otherMaterialImgList); // 重新获取所有图片的fileID
         }
       }
     })
@@ -660,12 +670,14 @@ Page({
         if (this.data.specialMaterialImgList.length != 0) {
           this.setData({
             specialMaterialImgList: this.data.specialMaterialImgList.concat(res.tempFilePaths)
-          })
+          });
         } else {
           this.setData({
             specialMaterialImgList: res.tempFilePaths
-          })
+          });
         }
+        this.data.special_material_img_ID_i = []; // 清空，否则重复保存时会在原来的list后面继续添加
+        this.saveSpecialMaterialImgIDs(this.data.specialMaterialImgList);  // 重复保存时，由于云端的路径相同，会覆盖原来的
       }
     });
   },
@@ -687,14 +699,18 @@ Page({
           this.data.specialMaterialImgList.splice(e.currentTarget.dataset.index, 1);
           this.setData({
             specialMaterialImgList: this.data.specialMaterialImgList
-          })
+          });
+          this.delSpecialMaterialImgIDs(this.data.special_material_img_ID_i); // 删除原来存放的所有图片的fileID
+          this.data.special_material_img_ID_i = [] // 清空，否则会在原来的list后面继续添加
+          this.saveSpecialMaterialImgIDs(this.data.specialMaterialImgList); // 重新获取所有图片的fileID
         }
       }
-    })
+    });
   },
 
   // 提交时保存图片文件，当上传云服务器到同一路径时则覆盖原文件
-  saveReportCardPdf: function (fileURL) {
+  saveReportCardPdfID: function (fileURL) {
+    // return new Promise((resolve, reject)=>{
     wx.cloud.uploadFile({
       cloudPath: this.data.student_name + '-report_card.pdf', // 上传至云端的路径
       filePath: fileURL[0], // 小程序临时文件路径
@@ -703,12 +719,26 @@ Page({
         //返回文件 ID
         this.setData({
           report_card_pdf_ID: res.fileID
-        });
+        })
+      },
+      fail: console.error
+    })
+    // .then(res=>{
+    //   console.log("res.fileID "+res.fileID)
+    //   resolve(res.fileID)
+    // })
+  },
+  delReportCardPdfID(fileID) {
+    console.log("del " + fileID);
+    wx.cloud.deleteFile({
+      fileList: [fileID], //云文件 ID
+      success: res => {
+        console.log("可信电子成绩单删除成功" + res.fileList)
       },
       fail: console.error
     })
   },
-  saveGrade4Img(fileURL) {
+  saveGrade4ImgID(fileURL) {
     wx.cloud.uploadFile({
       cloudPath: this.data.student_name + '-grade4.jpg', // 上传至云端的路径
       filePath: fileURL[0], // 小程序临时文件路径
@@ -722,20 +752,63 @@ Page({
       fail: console.error
     })
   },
-  saveOtherMaterialImg(fileURLList) {
+  delGrade4ID(fileID) {
+    console.log("del " + fileID);
+    wx.cloud.deleteFile({
+      fileList: [fileID], //云文件 ID
+      success: res => {
+        console.log("四级成绩单删除成功" + res.fileList)
+      },
+      fail: console.error
+    })
+  },
+  saveOtherMaterialImgIDs(fileURLList) {
     for (var i = 1; i <= fileURLList.length; i++) {
       wx.cloud.uploadFile({
         cloudPath: this.data.student_name + '-other_material-' + i + '.jpg', // 上传至云端的路径
         filePath: fileURLList[i - 1], // 小程序临时文件路径
         success: res => {
-          console.log("其他证明材料" + fileURLList.length + "份均上传成功", res)
-          if (this.data.special_material_img_ID_i.length != 0) {
+          console.log("其他证明材料上传成功", res)
+          if (this.data.other_material_img_ID_i.length != 0) {
             this.setData({
-              other_material_img_ID_i: this.data.other_material_img_ID_i.concat(res.fileID)
+              other_material_img_ID_i: this.data.other_material_img_ID_i.concat([res.fileID])
             })
           } else {
             this.setData({
-              other_material_img_ID_i: res.fileID
+              other_material_img_ID_i: [res.fileID]
+            });
+          }
+        },
+        fail: console.error
+      });
+    }
+  },
+  delOtherMaterialImgIDs(fileIDList) {
+    console.log("del " + fileIDList);
+    // for (var i = 0; i < fileIDList.length; i++) {
+      wx.cloud.deleteFile({
+        fileList: fileIDList, //云文件 ID
+        success: res => {
+          console.log("其他证明材料删除成功" + res.fileList)
+        },
+        fail: console.error
+      })
+    // }
+  },
+  saveSpecialMaterialImgIDs(fileURLList) {
+    for (var i = 1; i <= fileURLList.length; i++) {
+      wx.cloud.uploadFile({
+        cloudPath: this.data.student_name + '-special_material-' + i + '.jpg', // 上传至云端的路径
+        filePath: fileURLList[i - 1], // 小程序临时文件路径
+        success: res => {
+          console.log("特长证明材料上传成功", res)
+          if (this.data.special_material_img_ID_i.length != 0) {
+            this.setData({
+              special_material_img_ID_i: this.data.special_material_img_ID_i.concat([res.fileID])
+            })
+          } else {
+            this.setData({
+              special_material_img_ID_i: [res.fileID]
             })
           }
         },
@@ -743,25 +816,16 @@ Page({
       });
     }
   },
-  saveSpecialMaterialImg(fileURLList) {
-    for (var i = 1; i <= fileURLList.length; i++) {
-      wx.cloud.uploadFile({
-        cloudPath: this.data.student_name + '-special_material-' + i + '.jpg', // 上传至云端的路径
-        filePath: fileURLList[i - 1], // 小程序临时文件路径
+  delSpecialMaterialImgIDs(fileIDList) {
+    console.log("del " + fileIDList);
+    for (var i = 0; i < fileIDList.length; i++) {
+      wx.cloud.deleteFile({
+        fileList: [fileIDList[i]], //云文件 ID
         success: res => {
-          console.log("特长证明材料" + fileURLList.length + "份均上传成功", res)
-          if (this.data.special_material_img_ID_i.length != 0) {
-            this.setData({
-              special_material_img_ID_i: this.data.special_material_img_ID_i.concat(res.fileID)
-            })
-          } else {
-            this.setData({
-              special_material_img_ID_i: res.fileID
-            })
-          }
+          console.log("特长证明材料删除成功" + res.fileList)
         },
         fail: console.error
-      });
+      })
     }
   },
 
@@ -779,6 +843,11 @@ Page({
     if (!specialMaterialImgList) {
       //没有特长材料，并且没有成绩证明或者四级证明
       if (!report_card_pdf || !grade_4_img) {
+        wx.showToast({
+          title: '没有成绩证明或者四级证明，且没有特长证明材料',
+          icon: 'none',
+          duration: 500
+        })
         return false
       }
       //具备必要条件
@@ -792,78 +861,80 @@ Page({
     }
   },
   submitInfo: function () {
-    // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
-    if (!this.judge()) {
-      console.log("不满足提交条件")
-      return
-    } else {
-      //学分未修满70%将会降级
-      if (this.data.percent<70) {
-        this.setData({
-          if_agree_downgrade:true
+    // 判断逻辑，所有填写和上传的资料符合要求才能提交
+    // if (!this.judge()) {
+    //   console.log("不满足提交条件")
+    //   return
+    // } else {
+    // //学分未修满70%将会降级
+    // if (this.data.percent < 70) {
+    //   this.setData({
+    //     wx.showToast({
+    //       title: '学分未修满70%，需要同意降级',
+    //       icon: 'none',
+    //       duration: 500
+    //     })
+    //   })
+    // }
+
+    const db = wx.cloud.database()
+    // 页面1信息提交
+    db.collection("Student_Info").add({
+      data: {
+        student_name: this.data.student_name,
+        studentID: this.data.studentID,
+        gender: this.data.gender,
+        identity_num: this.data.identity_num,
+        phone_num: this.data.phone_num,
+        origin_college: this.data.origin_college,
+        origin_major: this.data.origin_major,
+        if_agree_downgrade: this.data.if_agree_downgrade,
+        graduation_choice: this.data.graduation_choice,
+        if_will_doctor: this.data.if_will_doctor
+      }
+    })
+
+    // 页面3信息提交
+    db.collection("Upload_Info").add({
+      data: {
+        report_card_pdf_ID: this.data.report_card_pdf_ID,
+        grade_point: this.data.grade_point,
+        grade_4_img_ID: this.data.grade_4_img_ID,
+        grade_4: this.data.grade_4,
+        other_material_img_ID_i: this.data.other_material_img_ID_i,
+        special_material_img_ID_i: this.data.special_material_img_ID_i,
+      },
+      success: res => {
+        console.log(res)
+        wx.showToast({
+          title: '提交成功',
+          icon: 'success',
+          duration: 500
         })
       }
-      this.saveReportCardPdf(this.data.report_card_pdf)
-      this.saveGrade4Img(this.data.grade_4_img)
-      this.saveOtherMaterialImg(this.data.otherMaterialImgList)
-      this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
+    })
 
-      console.log(this.data.report_card_pdf_ID + " for test")
-      // console.log(this.data.other_material_img_ID_i);
-      // console.log(this.data.special_material_img_ID_i);
-      const db = wx.cloud.database()
-      db.collection("student").add({
-        data: {
-          // 页面1信息
-          student_name: this.data.student_name,
-          studentID: this.data.studentID,
-          gender: this.data.gender,
-          identity_num: this.data.identity_num,
-          phone_num: this.data.phone_num,
-          origin_college: this.data.origin_college,
-          origin_major: this.data.origin_major,
-          if_agree_downgrade: this.data.if_agree_downgrade,
-          graduation_choice: this.data.graduation_choice,
-          if_will_doctor: this.data.if_will_doctor,
+    // 页面2信息提交
+    var openID = this.data.openid
+    wx.cloud.callFunction({
+      name: "delLearn_info",
+      data: {
+        openID: openID
+      }
+    })
 
-          // 页面3信息
-          report_card_pdf_ID: this.data.report_card_pdf_ID,
-          grade_point: this.data.grade_point,
-          grade_4_img_ID: this.data.grade_4_img_ID,
-          grade_4: this.data.grade_4,
-          //other_material_img_ID_i: this.data.other_material_img_ID_i,
-          //special_material_img_ID_i: this.data.special_material_img_ID_i,
-        },
-        success: res => {
-          console.log(res)
-          wx.showToast({
-            title: '提交成功',
-            icon: 'success',
-            duration: 500
-          })
-        }
-      })
-      // 页面2信息提交
-      var openID = this.data.openid
+    var Learn_Info = this.data.learned
+    for (let index = 0; index < Learn_Info.length; index++) {
+      const element = Learn_Info[index];
       wx.cloud.callFunction({
-        name: "delLearn_info",
+        name: "addLearn_info",
         data: {
-          openID: openID
+          openID: openID,
+          course_orderID: element.course_orderID,
+          if_learned: element.if_learned
         }
       })
-
-      var Learn_Info = this.data.learned
-      for (let index = 0; index < Learn_Info.length; index++) {
-        const element = Learn_Info[index];
-        wx.cloud.callFunction({
-          name: "addLearn_info",
-          data: {
-            openID: openID,
-            course_orderID: element.course_orderID,
-            if_learned: element.if_learned
-          }
-        })
-      }
     }
+    // }
   },
 })

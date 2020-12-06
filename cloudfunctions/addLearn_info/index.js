@@ -9,10 +9,10 @@ exports.main = async (event, context) => {
   const if_learned = event.if_learned
   const openID = event.openID
   await db.collection('Learn_Info').add({
-    data:{
+    data: {
       openID: openID,
-    course_orderID: course_orderID,
-    if_learned: if_learned,
+      course_orderID: course_orderID,
+      if_learned: if_learned,
     }
   })
 }
