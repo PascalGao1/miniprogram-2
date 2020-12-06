@@ -680,7 +680,7 @@ Page({
           });
         }
         this.data.special_material_img_ID_i = []; // 清空，否则重复保存时会在原来的list后面继续添加
-        this.saveSpecialMaterialImgIDs(this.data.specialMaterialImgList);  // 重复保存时，由于云端的路径相同，会覆盖原来的
+        this.saveSpecialMaterialImgIDs(this.data.specialMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的
       }
     });
   },
@@ -789,13 +789,13 @@ Page({
   delOtherMaterialImgIDs(fileIDList) {
     console.log("del " + fileIDList);
     // for (var i = 0; i < fileIDList.length; i++) {
-      wx.cloud.deleteFile({
-        fileList: fileIDList, //云文件 ID
-        success: res => {
-          console.log("其他证明材料删除成功" + res.fileList)
-        },
-        fail: console.error
-      })
+    wx.cloud.deleteFile({
+      fileList: fileIDList, //云文件 ID
+      success: res => {
+        console.log("其他证明材料删除成功" + res.fileList)
+      },
+      fail: console.error
+    })
     // }
   },
   saveSpecialMaterialImgIDs(fileURLList) {
@@ -848,7 +848,7 @@ Page({
       if (!report_card_pdf || !grade_4_img) {
         wx.showToast({
           title: '请完成1、2填写',
-          icon: '',
+          icon: 'none',
           duration: 1800
         })
         return false
@@ -863,7 +863,7 @@ Page({
       return true
     }
   },
-  chooseifagreedowngrade:function() {
+  chooseifagreedowngrade: function () {
     wx.showModal({
       title: '学分未达到70%将会降级',
       content: '确定要降级吗',
@@ -879,7 +879,7 @@ Page({
     })
   },
   submitInfo: function () {
-    // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
+    // 所有填写和上传的资料符合要求才能提交
     var judge = this.judge()
     if (!judge) {
       console.log("不满足提交条件")
@@ -888,84 +888,74 @@ Page({
       //学分未修满70%将会提示是否降级
       if (this.data.percent < 70) {
 
-        if(this.chooseifagreedowngrade()){
+        if (this.chooseifagreedowngrade()) {
           this.setData({
-            if_agree_downgrade:true
+            if_agree_downgrade: "同意"
           })
-        }
-        else{
+        } else {
           return
         }
       }
-      var that = this
-      this.saveReportCardPdf(that.data.report_card_pdf)
-      //.then((res)=>{
-      //   console.log("fileID"+res)
-      //   this.setData({
-      //     report_card_pdf_ID:res.fileID
-      //   })
-      // })
-      this.saveGrade4Img(this.data.grade_4_img)
-      this.saveOtherMaterialImg(this.data.otherMaterialImgList)
-      this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
 
-    const db = wx.cloud.database()
-    // 页面1信息提交
-    db.collection("Student_Info").add({
-      data: {
-        student_name: this.data.student_name,
-        studentID: this.data.studentID,
-        gender: this.data.gender,
-        identity_num: this.data.identity_num,
-        phone_num: this.data.phone_num,
-        origin_college: this.data.origin_college,
-        origin_major: this.data.origin_major,
-        if_agree_downgrade: this.data.if_agree_downgrade,
-        graduation_choice: this.data.graduation_choice,
-        if_will_doctor: this.data.if_will_doctor
-      }
-    })
-
-    // 页面3信息提交
-    db.collection("Upload_Info").add({
-      data: {
-        report_card_pdf_ID: this.data.report_card_pdf_ID,
-        grade_point: this.data.grade_point,
-        grade_4_img_ID: this.data.grade_4_img_ID,
-        grade_4: this.data.grade_4,
-        other_material_img_ID_i: this.data.other_material_img_ID_i,
-        special_material_img_ID_i: this.data.special_material_img_ID_i,
-      },
-      success: res => {
-        console.log(res)
-        wx.showToast({
-          title: '提交成功',
-          icon: 'success',
-          duration: 500
-        })
-      }
-    })
-
-    // 页面2信息提交
-    var openID = this.data.openid
-    wx.cloud.callFunction({
-      name: "delLearn_info",
-      data: {
-        openID: openID
-      }
-    })
-
-    var Learn_Info = this.data.learned
-    for (let index = 0; index < Learn_Info.length; index++) {
-      const element = Learn_Info[index];
-      wx.cloud.callFunction({
-        name: "addLearn_info",
+      const db = wx.cloud.database()
+      // 页面1信息提交
+      db.collection("Student_Info").add({
         data: {
-          openID: openID,
-          course_orderID: element.course_orderID,
-          if_learned: element.if_learned
+          student_name: this.data.student_name,
+          studentID: this.data.studentID,
+          gender: this.data.gender,
+          identity_num: this.data.identity_num,
+          phone_num: this.data.phone_num,
+          origin_college: this.data.origin_college,
+          origin_major: this.data.origin_major,
+          if_agree_downgrade: this.data.if_agree_downgrade,
+          graduation_choice: this.data.graduation_choice,
+          if_will_doctor: this.data.if_will_doctor
+        }
+      });
+
+      // 页面2信息提交
+      var openID = this.data.openid
+      wx.cloud.callFunction({
+        name: "delLearn_info",
+        data: {
+          openID: openID
         }
       })
+
+      var Learn_Info = this.data.learned
+      for (let index = 0; index < Learn_Info.length; index++) {
+        const element = Learn_Info[index];
+        wx.cloud.callFunction({
+          name: "addLearn_info",
+          data: {
+            openID: openID,
+            course_orderID: element.course_orderID,
+            if_learned: element.if_learned
+          }
+        })
+      }
+
+      // 页面3信息提交
+      db.collection("Upload_Info").add({
+        data: {
+          report_card_pdf_ID: this.data.report_card_pdf_ID,
+          grade_point: this.data.grade_point,
+          grade_4_img_ID: this.data.grade_4_img_ID,
+          grade_4: this.data.grade_4,
+          other_material_img_ID_i: this.data.other_material_img_ID_i,
+          special_material_img_ID_i: this.data.special_material_img_ID_i,
+        },
+        success: res => {
+          console.log(res)
+          wx.showToast({
+            title: '提交成功',
+            icon: 'success',
+            duration: 500
+          })
+        }
+      });
+
     }
-  },
+  }
 })
