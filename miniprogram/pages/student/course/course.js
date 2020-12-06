@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 3,
+    step: 1,
 
     //用户识别
     openid: '',
@@ -338,6 +338,10 @@ Page({
         console.error('获取用户openid失败', err)
       }
     })
+    var that = this
+    setTimeout(function () {
+      that.getLearn_info()
+    }, 1500)
   },
 
   // 切换页面
@@ -650,7 +654,6 @@ Page({
           this.setData({
             otherMaterialImgList: this.data.otherMaterialImgList
           });
-          console.log("test   ", this.data.other_material_img_ID_i);
           this.delOtherMaterialImgIDs(this.data.other_material_img_ID_i); // 删除原来存放的所有图片的fileID
           this.data.other_material_img_ID_i = [] // 清空，否则会在原来的list后面继续添加
           this.saveOtherMaterialImgIDs(this.data.otherMaterialImgList); // 重新获取所有图片的fileID
@@ -840,13 +843,13 @@ Page({
     //特长证明材料
     const specialMaterialImgList = this.data.specialMaterialImgList
 
-    if (!specialMaterialImgList) {
+    if (specialMaterialImgList.length == 0) {
       //没有特长材料，并且没有成绩证明或者四级证明
       if (!report_card_pdf || !grade_4_img) {
         wx.showToast({
-          title: '没有成绩证明或者四级证明，且没有特长证明材料',
-          icon: 'none',
-          duration: 500
+          title: '请完成1、2填写',
+          icon: '',
+          duration: 1800
         })
         return false
       }
@@ -860,22 +863,51 @@ Page({
       return true
     }
   },
+  chooseifagreedowngrade:function() {
+    wx.showModal({
+      title: '学分未达到70%将会降级',
+      content: '确定要降级吗',
+      cancelText: '取消',
+      confirmText: '确定',
+      success: res => {
+        if (res.confirm) {
+          return true
+        } else if (res.cancel) {
+          return false
+        }
+      }
+    })
+  },
   submitInfo: function () {
-    // 判断逻辑，所有填写和上传的资料符合要求才能提交
-    // if (!this.judge()) {
-    //   console.log("不满足提交条件")
-    //   return
-    // } else {
-    // //学分未修满70%将会降级
-    // if (this.data.percent < 70) {
-    //   this.setData({
-    //     wx.showToast({
-    //       title: '学分未修满70%，需要同意降级',
-    //       icon: 'none',
-    //       duration: 500
-    //     })
-    //   })
-    // }
+    // TODO: 添加判断逻辑，所有填写和上传的资料符合要求才能提交
+    var judge = this.judge()
+    if (!judge) {
+      console.log("不满足提交条件")
+      return
+    } else {
+      //学分未修满70%将会提示是否降级
+      if (this.data.percent < 70) {
+
+        if(this.chooseifagreedowngrade()){
+          this.setData({
+            if_agree_downgrade:true
+          })
+        }
+        else{
+          return
+        }
+      }
+      var that = this
+      this.saveReportCardPdf(that.data.report_card_pdf)
+      //.then((res)=>{
+      //   console.log("fileID"+res)
+      //   this.setData({
+      //     report_card_pdf_ID:res.fileID
+      //   })
+      // })
+      this.saveGrade4Img(this.data.grade_4_img)
+      this.saveOtherMaterialImg(this.data.otherMaterialImgList)
+      this.saveSpecialMaterialImg(this.data.specialMaterialImgList)
 
     const db = wx.cloud.database()
     // 页面1信息提交
@@ -935,6 +967,5 @@ Page({
         }
       })
     }
-    // }
   },
 })

@@ -83,11 +83,10 @@
 
 	<!-- 页面二：填写完成课程情况 -->
 	<view class="inner" wx:if="{{step==2}}">
-		<button class="floatbutton" bindtap="getLearn_info">查</button>
-			<view class="flex">
-				<view  class="basis-xl bg-white margin-xs padding-sm radius">课程信息</view>
-				<view class="basis-xs bg-white margin-xs padding-sm radius">已修</view>
-			</view>
+		<view class="flex">
+			<view class="basis-xl bg-white margin-xs padding-sm radius">课程信息</view>
+			<view class="basis-xs bg-white margin-xs padding-sm radius">已修</view>
+		</view>
 		<view class="bg-white padding-lr">
 			<view class="solids-bottom padding-xs flex align-center" wx:for="{{course_info}}" wx:key="course_orderID" wx:for-item="course" wx:for-index="index">
 				<view class="flex-sub text-left">
@@ -98,8 +97,8 @@
 			</view>
 		</view>
 		<view class="solid-bottom text-lg padding">
-        <text class="text-grey">已修学分（未修满第一学年课程的70%学分将会强制降级）</text>
-    </view>
+			<text class="text-grey">已修学分（未修满第一学年课程的70%学分将会强制降级）</text>
+		</view>
 		<view class="padding bg-white ">
 			<progress percent="{{percent}}" stroke-width='12' activeColor="#10AEFF" border-radius="30" show-info></progress>
 		</view>
