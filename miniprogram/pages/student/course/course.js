@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 3,
+    step: 1,
 
     //用户识别
     openid: '',
@@ -583,8 +583,7 @@ Page({
           wx.showToast({
             title: '文件不超过4MB，格式需为pdf',
             icon: "none",
-            duration: 1000,
-            mask: true
+            duration: 1000
           })
         } else {
           that.setData({
@@ -651,8 +650,7 @@ Page({
           wx.showToast({
             title: '文件不超过4MB',
             icon: "none",
-            duration: 1000,
-            mask: true
+            duration: 1000
           })
         } else {
           if (filename.indexOf(".jpg") != -1) {
@@ -663,8 +661,7 @@ Page({
             wx.showToast({
               title: '图片格式应为png或jpg',
               icon: "none",
-              duration: 1000,
-              mask: true
+              duration: 1000
             })
           }
 
@@ -742,15 +739,13 @@ Page({
             wx.showToast({
               title: '文件不超过4MB',
               icon: "none",
-              duration: 1000,
-              mask: true
+              duration: 1000
             });
           } else if (filename.indexOf(".jpg") == -1 && filename.indexOf(".png") == -1) {
             wx.showToast({
               title: '图片格式应为png或jpg',
               icon: "none",
-              duration: 1000,
-              mask: true
+              duration: 1000
             });
           } else {
             if (that.data.otherMaterialImgList.length != 0) {
@@ -835,15 +830,13 @@ Page({
             wx.showToast({
               title: '文件不超过4MB',
               icon: "none",
-              duration: 1000,
-              mask: true
+              duration: 1000
             });
           } else if (filename.indexOf(".jpg") == -1 && filename.indexOf(".png") == -1) {
             wx.showToast({
               title: '图片的格式应为png或jpg',
               icon: "none",
-              duration: 1000,
-              mask: true
+              duration: 1000
             });
           } else {
             if (that.data.specialMaterialImgList.length != 0) {
@@ -1042,7 +1035,7 @@ Page({
         wx.showToast({
           title: '请完成1、2部分填写',
           icon: 'none',
-          duration: 2500
+          duration: 1000
         })
         return false
       }
@@ -1051,7 +1044,7 @@ Page({
         wx.showToast({
           title: '必修学分绩点需不低于3.40，并且四级成绩需不低于525',
           icon: 'none',
-          duration: 3000
+          duration: 1000
         })
         return false
       }
