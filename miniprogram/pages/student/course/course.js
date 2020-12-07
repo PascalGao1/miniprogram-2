@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 1,
+    step: 3,
 
     //用户识别
     openid: '',
@@ -529,18 +529,42 @@ Page({
   // 页面3
   // 可信电子成绩单
   chooseReportCardPdf() {
-    wx.chooseImage({
-      count: 1, //默认9
-      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-      sourceType: ['album'], //从相册选择
-      success: (res) => {
-        console.log(res.tempFilePaths);
-        this.setData({
-          report_card_pdf: res.tempFilePaths
-        });
-        this.saveReportCardPdfID(this.data.report_card_pdf);
+    // wx.chooseImage({
+    //   count: 1, //默认9
+    //   sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+    //   sourceType: ['album'], //从相册选择
+    //   success: (res) => {
+    //     console.log(res.tempFilePaths);
+    //     this.setData({
+    //       report_card_pdf: res.tempFilePaths
+    //     });
+    //     this.saveReportCardPdfID(this.data.report_card_pdf);
+    //   }
+    // });
+    var that = this;
+    wx.chooseMessageFile({
+      count: 1, //能选择文件的数量
+      type: 'file', //能选择文件的类型,这里只允许上传文件.还有视频,图片,或者都可以
+      success(res) {
+        var size = res.tempFiles[0].size;
+        var filename = res.tempFiles[0].name + "";
+        console.log(filename);
+        if (size > 4194304 || filename.indexOf(".pdf") == -1) { //限制文件的大小和具体文件类型
+          wx.showToast({
+            title: '文件不超过4MB，格式需为pdf',
+            icon: "none",
+            duration: 1000,
+            mask: true
+          })
+        } else {
+          that.setData({
+            report_card_pdf: res.tempFiles[0].path //将文件的路径保存在页面的变量上,方便 wx.uploadFile调用
+          });
+          console.log(that.data.report_card_pdf);
+          that.saveReportCardPdfID(that.data.report_card_pdf);
+        }
       }
-    });
+    })
   },
   viewReportCardPdf(e) {
     wx.previewImage({
@@ -559,6 +583,7 @@ Page({
             report_card_pdf: ""
           })
           this.delReportCardPdfID(this.data.report_card_pdf_ID);
+          this.data.report_card_pdf_ID = "";
         }
       }
     });
@@ -572,18 +597,58 @@ Page({
 
   // 四级成绩
   chooseGrade4Img() {
-    wx.chooseImage({
-      count: 1, //默认9
-      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-      sourceType: ['album'], //从相册选择
-      success: (res) => {
-        console.log(res.tempFilePaths);
-        this.setData({
-          grade_4_img: res.tempFilePaths
-        });
-        this.saveGrade4ImgID(this.data.grade_4_img);
+    // wx.chooseImage({
+    //   count: 1, //默认9
+    //   sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+    //   sourceType: ['album'], //从相册选择
+    //   success: (res) => {
+    //     console.log(res.tempFilePaths);
+    //     this.setData({
+    //       grade_4_img: res.tempFilePaths
+    //     });
+    //     this.saveGrade4ImgID(this.data.grade_4_img);
+    //   }
+    // });
+    var that = this;
+    wx.chooseMessageFile({
+      count: 1, //能选择文件的数量
+      type: 'image', //只允许上传图片
+      success(res) {
+        var size = res.tempFiles[0].size;
+        var filename = res.tempFiles[0].name + "";
+        var filetype = "";
+        console.log(filename);
+        if (size > 4194304) { //限制文件的大小
+          wx.showToast({
+            title: '文件不超过4MB',
+            icon: "none",
+            duration: 1000,
+            mask: true
+          })
+        } else {
+          if (filename.indexOf(".jpg") != -1) {
+            filetype = ".jpg";
+          } else if (filename.indexOf(".png") != -1) {
+            filetype = ".png";
+          } else {
+            wx.showToast({
+              title: '图片格式应为png或jpg',
+              icon: "none",
+              duration: 1000,
+              mask: true
+            })
+          }
+
+          if (filetype != "") {
+            that.setData({
+              grade_4_img: res.tempFiles[0].path //将文件的路径保存在页面的变量上,方便 wx.uploadFile调用
+            });
+            console.log(that.data.grade_4_img);
+            that.saveGrade4ImgID(that.data.grade_4_img, filetype);
+          }
+        }
       }
-    });
+    })
   },
   viewGrade4Img(e) {
     wx.previewImage({
@@ -602,6 +667,7 @@ Page({
             grade_4_img: ""
           });
           this.delGrade4ImgID(this.data.grade_4_img_ID);
+          this.data.grade_4_img_ID = "";
         }
       }
     })
@@ -615,25 +681,68 @@ Page({
 
   // 其他证明材料
   chooseOtherMaterialImg() {
-    wx.chooseImage({
-      count: 4, //默认9
-      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-      sourceType: ['album'], //从相册选择
-      success: (res) => {
-        console.log(res.tempFilePaths);
-        if (this.data.otherMaterialImgList.length != 0) {
-          this.setData({
-            otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
-          });
-        } else {
-          this.setData({
-            otherMaterialImgList: res.tempFilePaths
-          });
+    // wx.chooseImage({
+    //   count: 4, //默认9
+    //   sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+    //   sourceType: ['album'], //从相册选择
+    //   success: (res) => {
+    //     console.log(res.tempFilePaths);
+    //     if (this.data.otherMaterialImgList.length != 0) {
+    //       this.setData({
+    //         otherMaterialImgList: this.data.otherMaterialImgList.concat(res.tempFilePaths)
+    //       });
+    //     } else {
+    //       this.setData({
+    //         otherMaterialImgList: res.tempFilePaths
+    //       });
+    //     }
+    //     this.data.other_material_img_ID_i = [] // 清空，否则重复保存时会在原来的list后面继续添加
+    //     this.saveOtherMaterialImgIDs(this.data.otherMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的
+    //   }
+    // });
+    var that = this;
+    var num = 0;
+    wx.chooseMessageFile({
+      count: 4, //能选择文件的数量
+      type: 'image', //只允许上传图片
+      success(res) {
+        while (res.tempFiles[num] != undefined) {
+          var size = res.tempFiles[num].size;
+          var filename = res.tempFiles[num].name + "";
+          if (size > 4194304) { //限制文件的大小
+            wx.showToast({
+              title: '文件不超过4MB',
+              icon: "none",
+              duration: 1000,
+              mask: true
+            });
+          } else if (filename.indexOf(".jpg") == -1 && filename.indexOf(".png") == -1) {
+            wx.showToast({
+              title: '图片格式应为png或jpg',
+              icon: "none",
+              duration: 1000,
+              mask: true
+            });
+          } else {
+            if (that.data.otherMaterialImgList.length != 0) {
+              that.setData({
+                otherMaterialImgList: that.data.otherMaterialImgList.concat([res.tempFiles[num].path]) //将文件的路径保存在页面的变量上,方便 wx.uploadFile调用
+              });
+              console.log("see1   ", that.data.otherMaterialImgList);
+            } else {
+              that.setData({
+                otherMaterialImgList: [res.tempFiles[num].path] //将文件的路径保存在页面的变量上,方便 wx.uploadFile调用
+              });
+              console.log("see2   ", that.data.otherMaterialImgList);
+            }
+            that.delOtherMaterialImgIDs(that.data.other_material_img_ID_i); // 删除原来存放的所有图片的fileID
+            that.data.other_material_img_ID_i = [] // 清空，否则重复保存时会在原来的list后面继续添加
+            that.saveOtherMaterialImgIDs(that.data.otherMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的，但是并没有
+          }
+          num++;
         }
-        this.data.other_material_img_ID_i = [] // 清空，否则重复保存时会在原来的list后面继续添加
-        this.saveOtherMaterialImgIDs(this.data.otherMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的
       }
-    });
+    })
   },
   viewOtherMaterialImg(e) {
     wx.previewImage({
@@ -664,25 +773,67 @@ Page({
 
   //特长证明材料
   chooseSpecialMaterialImg() {
-    wx.chooseImage({
-      count: 4, //默认9
-      sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-      sourceType: ['album'], //从相册选择
-      success: (res) => {
-        console.log(res.tempFilePaths);
-        if (this.data.specialMaterialImgList.length != 0) {
-          this.setData({
-            specialMaterialImgList: this.data.specialMaterialImgList.concat(res.tempFilePaths)
-          });
-        } else {
-          this.setData({
-            specialMaterialImgList: res.tempFilePaths
-          });
+    // wx.chooseImage({
+    //   count: 4, //默认9
+    //   sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+    //   sourceType: ['album'], //从相册选择
+    //   success: (res) => {
+    //     console.log(res.tempFilePaths);
+    //     if (this.data.specialMaterialImgList.length != 0) {
+    //       this.setData({
+    //         specialMaterialImgList: this.data.specialMaterialImgList.concat(res.tempFilePaths)
+    //       });
+    //     } else {
+    //       this.setData({
+    //         specialMaterialImgList: res.tempFilePaths
+    //       });
+    //     }
+    //     this.data.special_material_img_ID_i = []; // 清空，否则重复保存时会在原来的list后面继续添加
+    //     this.saveSpecialMaterialImgIDs(this.data.specialMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的
+    //   }
+    // });
+    var that = this;
+    var num = 0;
+    wx.chooseMessageFile({
+      count: 4, //能选择文件的数量
+      type: 'image', //只允许上传图片
+      success(res) {
+        while (res.tempFiles[num] != undefined) {
+          var size = res.tempFiles[num].size;
+          var filename = res.tempFiles[num].name + "";
+          console.log(filename);
+          if (size > 4194304) { //限制文件的大小
+            wx.showToast({
+              title: '文件不超过4MB',
+              icon: "none",
+              duration: 1000,
+              mask: true
+            });
+          } else if (filename.indexOf(".jpg") == -1 && filename.indexOf(".png") == -1) {
+            wx.showToast({
+              title: '图片的格式应为png或jpg',
+              icon: "none",
+              duration: 1000,
+              mask: true
+            });
+          } else {
+            if (that.data.specialMaterialImgList.length != 0) {
+              that.setData({
+                specialMaterialImgList: that.data.specialMaterialImgList.concat([res.tempFiles[num].path]) //将文件的路径保存在页面的变量上,方便 wx.uploadFile调用
+              });
+            } else {
+              that.setData({
+                specialMaterialImgList: [res.tempFiles[num].path] //将文件的路径保存在页面的变量上,方便 wx.uploadFile调用
+              });
+            }
+            that.delSpecialMaterialImgIDs(that.data.special_material_img_ID_i); // 删除原来存放的所有图片的fileID
+            that.data.special_material_img_ID_i = [] // 清空，否则重复保存时会在原来的list后面继续添加
+            that.saveSpecialMaterialImgIDs(that.data.specialMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的，但是并没有
+          }
+          num++;
         }
-        this.data.special_material_img_ID_i = []; // 清空，否则重复保存时会在原来的list后面继续添加
-        this.saveSpecialMaterialImgIDs(this.data.specialMaterialImgList); // 重复保存时，由于云端的路径相同，会覆盖原来的
       }
-    });
+    })
   },
   viewSpecialMaterialImg(e) {
     wx.previewImage({
@@ -716,7 +867,7 @@ Page({
     // return new Promise((resolve, reject)=>{
     wx.cloud.uploadFile({
       cloudPath: this.data.student_name + '-report_card.pdf', // 上传至云端的路径
-      filePath: fileURL[0], // 小程序临时文件路径
+      filePath: fileURL, // 小程序临时文件路径
       success: res => {
         console.log("可信电子成绩单上传成功", res)
         //返回文件 ID
@@ -741,10 +892,10 @@ Page({
       fail: console.error
     })
   },
-  saveGrade4ImgID(fileURL) {
+  saveGrade4ImgID(fileURL, filetype) {
     wx.cloud.uploadFile({
-      cloudPath: this.data.student_name + '-grade4.jpg', // 上传至云端的路径
-      filePath: fileURL[0], // 小程序临时文件路径
+      cloudPath: this.data.student_name + '-grade4' + filetype, // 上传至云端的路径
+      filePath: fileURL, // 小程序临时文件路径
       success: res => {
         console.log("四级成绩单上传成功", res)
         // 返回文件 ID
@@ -755,7 +906,7 @@ Page({
       fail: console.error
     })
   },
-  delGrade4ID(fileID) {
+  delGrade4ImgID(fileID) {
     console.log("del " + fileID);
     wx.cloud.deleteFile({
       fileList: [fileID], //云文件 ID
@@ -766,9 +917,15 @@ Page({
     })
   },
   saveOtherMaterialImgIDs(fileURLList) {
+    var imgtype = "";
     for (var i = 1; i <= fileURLList.length; i++) {
+      if (fileURLList[i - 1].indexOf(".png") != -1) {
+        imgtype = ".png";
+      } else {
+        imgtype = ".jpg";
+      }
       wx.cloud.uploadFile({
-        cloudPath: this.data.student_name + '-other_material-' + i + '.jpg', // 上传至云端的路径
+        cloudPath: this.data.student_name + '-other_material-' + i + imgtype, // 上传至云端的路径
         filePath: fileURLList[i - 1], // 小程序临时文件路径
         success: res => {
           console.log("其他证明材料上传成功", res)
@@ -792,16 +949,22 @@ Page({
     wx.cloud.deleteFile({
       fileList: fileIDList, //云文件 ID
       success: res => {
-        console.log("其他证明材料删除成功" + res.fileList)
+        console.log("其他证明材料删除成功")
       },
       fail: console.error
     })
     // }
   },
   saveSpecialMaterialImgIDs(fileURLList) {
+    var imgtype = "";
     for (var i = 1; i <= fileURLList.length; i++) {
+      if (fileURLList[i - 1].indexOf(".png") != -1) {
+        imgtype = ".png";
+      } else {
+        imgtype = ".jpg";
+      }
       wx.cloud.uploadFile({
-        cloudPath: this.data.student_name + '-special_material-' + i + '.jpg', // 上传至云端的路径
+        cloudPath: this.data.student_name + '-special_material-' + i + imgtype, // 上传至云端的路径
         filePath: fileURLList[i - 1], // 小程序临时文件路径
         success: res => {
           console.log("特长证明材料上传成功", res)
@@ -825,7 +988,7 @@ Page({
       wx.cloud.deleteFile({
         fileList: [fileIDList[i]], //云文件 ID
         success: res => {
-          console.log("特长证明材料删除成功" + res.fileList)
+          console.log("特长证明材料删除成功")
         },
         fail: console.error
       })
