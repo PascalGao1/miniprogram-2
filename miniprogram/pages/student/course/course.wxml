@@ -169,7 +169,6 @@
 					<input placeholder="请输入必修学分绩点" bindinput="bindGradePoint" value="{{grade_point}}" type="text"></input>
 				</view>
 			</form>
-
 			<view class="cu-bar bg-white margin-top">
 				<view class="action">
 					2、上传四级成绩单图片（必填）
