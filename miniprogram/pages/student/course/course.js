@@ -307,7 +307,7 @@ Page({
 
     // 页面3
     report_card_pdf: "",
-    grade_point:"",
+    grade_point: "",
     grade_4_img: "",
     grade_4: "",
     otherMaterialImgList: [],
@@ -339,16 +339,110 @@ Page({
       }
     })
     var that = this
+
     setTimeout(function () {
+      that.getStudent_Info()
       that.getLearn_info()
-    }, 1500)
+    }, 1000)
+  },
+  /*
+   *查询学生是否以填报并返回已完成课程,然后修改当前页面中的数据
+   */
+  getLearn_info: function () {
+    var openID = this.data.openid
+    var that = this
+    if (!openID) {
+      console.error("请重新打开小程序")
+    } else {
+      wx.cloud.callFunction({
+        name: "getLearn_info",
+        data: {
+          openID: openID
+        },
+        success(res) {
+          if (!res.result.data) {
+            console.log("无此名学生记录")
+          } else {
+            var currentcredit = 0;
+            for (let index = 0; index < res.result.data.length; index++) {
+              const element = res.result.data[index]
+              var target = parseInt(element.course_orderID) - 1
+              var value = element.if_learned
+              var str = "learned[" + target + "].if_learned"
+              if (value) {
+                currentcredit += that.data.course_info[target].credit
+              }
+              that.setData({
+                [str]: value
+              })
+            }
+            that.setData({
+              credits: currentcredit,
+              percent: Math.floor(100 * currentcredit / 46)
+            })
+          }
+        }
+      })
+    }
+  },
+  /*
+   *查询学生是否以填报并返回个人信息,然后修改当前页面中的数据
+   */
+  getStudent_Info: function () {
+    var openID = this.data.openid
+    const db = wx.cloud.database()
+    var that = this
+    var data
+    db.collection('Student_Info').where({
+      _openid: openID
+    }).get().then(res => {
+      data = res.data
+    })
+    if (!data) {
+      console.log("无当前学生记录")
+    } else {
+      setTimeout(function () {
+        console.log(data[0])
+        that.setData({
+          student_name: data[0].student_name,
+          studentID: data[0].studentID,
+          gender: data[0].gender,
+          identity_num: data[0].identity_num,
+          phone_num: data[0].phone_num,
+          origin_college: data[0].origin_college,
+          origin_major: data[0].origin_major,
+          if_agree_downgrade: data[0].if_agree_downgrade,
+          graduation_choice: data[0].graduation_choice,
+          if_will_doctor: data[0].if_will_doctor
+        })
+      }, 500)
+    }
   },
 
+  //判断页面一是否完成
+  pageOneFinished: function () {
+    return (this.data.student_name && this.data.studentID && this.data.gender && this.data.identity_num && this.data.phone_num && this.data.origin_college && this.data.origin_major && this.data.if_agree_downgrade && this.data.graduation_choice && this.data.if_will_doctor)
+  },
   // 切换页面
   nextStep: function () {
+    //在第一页准备前往第二页
+    if (this.data.step == 1) {
+      if (!this.pageOneFinished()) {
+        wx.showToast({
+          title: '请完成个人信息填写',
+          icon: 'none',
+          duration: 1000
+        })
+      } else {
+        this.setData({
+          step: this.data.step + 1
+        })
+      }
+    }
+
     //在第二页准备前往第三页
-    if (this.data.step == 2) {
-      if (this.data.percent < 70 && (this.data.if_agree_downgrade == "不同意" ||this.data.if_agree_downgrade == null)) {
+    else if (this.data.step == 2) {
+      if (this.data.percent < 70 && (this.data.if_agree_downgrade == "不同意" || this.data.if_agree_downgrade == null)) {
         wx.showModal({
           title: '学分未达到70%将会降级',
           content: '确定要降级吗',
@@ -358,26 +452,21 @@ Page({
             console.log(res)
             if (res.confirm) {
               this.setData({
-                step:3,
-                if_agree_downgrade:"同意"
+                step: 3,
+                if_agree_downgrade: "同意"
               })
             } else if (res.cancel) {
               this.setData({
-                step:1
+                step: 1
               })
             }
           }
         })
-      }
-      else{
+      } else {
         this.setData({
           step: this.data.step + 1
         })
       }
-    } else {
-      this.setData({
-        step: this.data.step + 1
-      })
     }
   },
   prevStep: function () {
@@ -515,47 +604,6 @@ Page({
       percent: Math.floor(100 * this.data.credits / 46)
     })
   },
-  /*
-   *查询学生是否以填报并返回已完成课程,然后修改当前页面中的数据
-   */
-  getLearn_info: function () {
-    var openID = this.data.openid
-    var that = this
-    if (!openID) {
-      console.error("请重新打开小程序")
-    } else {
-      wx.cloud.callFunction({
-        name: "getLearn_info",
-        data: {
-          openID: openID
-        },
-        success(res) {
-          if (!res.result.data) {
-            console.log("无此名学生记录")
-          } else {
-            var currentcredit = 0;
-            for (let index = 0; index < res.result.data.length; index++) {
-              const element = res.result.data[index]
-              var target = parseInt(element.course_orderID) - 1
-              var value = element.if_learned
-              var str = "learned[" + target + "].if_learned"
-              if (value) {
-                currentcredit += that.data.course_info[target].credit
-              }
-              that.setData({
-                [str]: value
-              })
-            }
-            that.setData({
-              credits: currentcredit,
-              percent: Math.floor(100 * currentcredit / 46)
-            })
-          }
-        }
-      })
-    }
-  },
-
   // 页面3
   // 可信电子成绩单
   chooseReportCardPdf() {
@@ -1047,8 +1095,7 @@ Page({
           duration: 1000
         })
         return false
-      }
-      else{
+      } else {
         return true
       }
     }
@@ -1079,8 +1126,7 @@ Page({
           graduation_choice: this.data.graduation_choice,
           if_will_doctor: this.data.if_will_doctor
         }
-      });
-
+      })
       // 页面2信息提交
       var openID = this.data.openid
       wx.cloud.callFunction({
@@ -1089,7 +1135,6 @@ Page({
           openID: openID
         }
       })
-
       var Learn_Info = this.data.learned
       for (let index = 0; index < Learn_Info.length; index++) {
         const element = Learn_Info[index];
@@ -1102,7 +1147,6 @@ Page({
           }
         })
       }
-
       // 页面3信息提交
       db.collection("Upload_Info").add({
         data: {
@@ -1121,7 +1165,8 @@ Page({
             duration: 500
           })
         }
-      });
+      })
+
     }
   }
 })
