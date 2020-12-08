@@ -8,20 +8,20 @@ Page({
     openid: '',
 
     // 页面1
-    student_name: "",
-    studentID: "",
-    gender: null,
-    identity_num: "",
-    phone_num: "",
-    origin_college: "",
+    student_name: null,
+    studentID: null,
+    gender: "男",
+    identity_num: null,
+    phone_num: null,
+    origin_college: null,
     originCollegeIndex: null,
     originCollegePicker: ['国外深造', '国内读研', '就业', '待定'],
-    origin_major: "",
-    if_agree_downgrade: null,
+    origin_major: null,
+    if_agree_downgrade: "同意",
     graduationChoiceIndex: null,
     graduationChoicePicker: ['国外深造', '国内读研', '就业', '待定'],
     graduation_choice: null,
-    if_will_doctor: null,
+    if_will_doctor: "是",
 
     // 页面2
     course_info: [{
@@ -442,7 +442,7 @@ Page({
 
     //在第二页准备前往第三页
     else if (this.data.step == 2) {
-      if (this.data.percent < 70 && (this.data.if_agree_downgrade == "不同意" || this.data.if_agree_downgrade == null)) {
+      if (this.data.percent < 70 && this.data.if_agree_downgrade == "不同意") {
         wx.showModal({
           title: '学分未达到70%将会降级',
           content: '确定要降级吗',
@@ -1092,7 +1092,7 @@ Page({
         wx.showToast({
           title: '必修学分绩点需不低于3.40，并且四级成绩需不低于525',
           icon: 'none',
-          duration: 1000
+          duration: 2000
         })
         return false
       } else {
