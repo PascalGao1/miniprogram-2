@@ -1,7 +1,6 @@
 {
   "pages": [
-    "pages/student/course/course",
-    "pages/test/test"
+    "pages/student/course/course"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
