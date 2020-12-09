@@ -343,7 +343,7 @@ Page({
     setTimeout(function () {
       that.getStudent_Info()
       that.getLearn_info()
-    }, 1000)
+    }, 1500)
   },
   /*
    *查询学生是否以填报并返回已完成课程,然后修改当前页面中的数据
@@ -1104,69 +1104,85 @@ Page({
       return true
     }
   },
+
+  addinfo: function (that) {
+    // 页面1信息提交
+    wx.cloud.callFunction({
+      name: "addStudent_Info",
+      data: {
+        Student_Info: {
+          student_name: that.data.student_name,
+          studentID: that.data.studentID,
+          gender: that.data.gender,
+          identity_num: that.data.identity_num,
+          phone_num: that.data.phone_num,
+          origin_college: that.data.origin_college,
+          origin_major: that.data.origin_major,
+          if_agree_downgrade: that.data.if_agree_downgrade,
+          graduation_choice: that.data.graduation_choice,
+          if_will_doctor: that.data.if_will_doctor,
+          _openid: that.data.openid
+        }
+      }
+    })
+
+    // 页面2信息提交
+    var Learn_Info = that.data.learned
+    for (let index = 0; index < Learn_Info.length; index++) {
+      const element = Learn_Info[index];
+      wx.cloud.callFunction({
+        name: "addLearn_info",
+        data: {
+          openID: that.data.openid,
+          course_orderID: element.course_orderID,
+          if_learned: element.if_learned
+        }
+      })
+    }
+
+    // 页面3信息提交
+    wx.cloud.callFunction({
+      name: "addUpload_Info",
+      data: {
+        Upload_Info: {
+          report_card_pdf_ID: that.data.report_card_pdf_ID,
+          grade_point: that.data.grade_point,
+          grade_4_img_ID: that.data.grade_4_img_ID,
+          grade_4: that.data.grade_4,
+          other_material_img_ID_i: that.data.other_material_img_ID_i,
+          special_material_img_ID_i: that.data.special_material_img_ID_i,
+          _openid: that.data.openid,
+        }
+      },
+      success: res => {
+        console.log(res)
+        wx.showToast({
+          title: '提交成功',
+          icon: 'success',
+          duration: 500
+        })
+      }
+    })
+  },
   submitInfo: function () {
     // 所有填写和上传的资料符合要求才能提交
     var judge = this.judge()
+    var that = this
     if (!judge) {
       console.log("不满足提交条件")
       return
     } else {
-      const db = wx.cloud.database()
-      // 页面1信息提交
-      db.collection("Student_Info").add({
-        data: {
-          student_name: this.data.student_name,
-          studentID: this.data.studentID,
-          gender: this.data.gender,
-          identity_num: this.data.identity_num,
-          phone_num: this.data.phone_num,
-          origin_college: this.data.origin_college,
-          origin_major: this.data.origin_major,
-          if_agree_downgrade: this.data.if_agree_downgrade,
-          graduation_choice: this.data.graduation_choice,
-          if_will_doctor: this.data.if_will_doctor
-        }
-      })
-      // 页面2信息提交
       var openID = this.data.openid
+      //原页面删除
       wx.cloud.callFunction({
-        name: "delLearn_info",
+        name: "delStudent_Info",
         data: {
           openID: openID
         }
       })
-      var Learn_Info = this.data.learned
-      for (let index = 0; index < Learn_Info.length; index++) {
-        const element = Learn_Info[index];
-        wx.cloud.callFunction({
-          name: "addLearn_info",
-          data: {
-            openID: openID,
-            course_orderID: element.course_orderID,
-            if_learned: element.if_learned
-          }
-        })
-      }
-      // 页面3信息提交
-      db.collection("Upload_Info").add({
-        data: {
-          report_card_pdf_ID: this.data.report_card_pdf_ID,
-          grade_point: this.data.grade_point,
-          grade_4_img_ID: this.data.grade_4_img_ID,
-          grade_4: this.data.grade_4,
-          other_material_img_ID_i: this.data.other_material_img_ID_i,
-          special_material_img_ID_i: this.data.special_material_img_ID_i,
-        },
-        success: res => {
-          console.log(res)
-          wx.showToast({
-            title: '提交成功',
-            icon: 'success',
-            duration: 500
-          })
-        }
-      })
-
+      setTimeout(function () {
+        that.addinfo(that)
+      }, 1000)
     }
   }
 })
