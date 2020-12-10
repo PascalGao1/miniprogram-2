@@ -66,10 +66,17 @@
 					<view wx:if="{{if_will_doctor==\"是\"}}">
 						<radio class="red" value="是" checked="true"></radio>是
 						<radio class="red" value="否"></radio>否
+						<radio class="red" value="待定"></radio>待定
+					</view>
+					<view wx:elif="{{if_will_doctor==\"否\"}}">
+						<radio class="red" value="是"></radio>是
+						<radio class="red" value="否" checked="true"></radio>否
+						<radio class="red" value="待定"></radio>待定
 					</view>
 					<view wx:else>
 						<radio class="red" value="是"></radio>是
-						<radio class="red" value="否" checked="true"></radio>否
+						<radio class="red" value="否"></radio>否
+						<radio class="red" value="待定" checked="true"></radio>待定
 					</view>
 				</view>
 			</radio-group>
@@ -168,7 +175,7 @@
 			<form>
 				<view class="cu-form-group">
 					<view class="title">必修学分绩点</view>
-					<input placeholder="请输入必修学分绩点" bindinput="bindGradePoint" value="{{grade_point}}" type="text"></input>
+					<input placeholder="请输入必修学分绩点" bindinput="bindGradePoint" bindblur="gradePointBlur" value="{{grade_point}}" type="text"></input>
 				</view>
 			</form>
 			<view class="cu-bar bg-white margin-top">
@@ -205,7 +212,7 @@
 			<form>
 				<view class="cu-form-group">
 					<view class="title">四级成绩</view>
-					<input placeholder="请输入四级成绩" bindinput="bindGrade4" value="{{grade_4}}" type="text"></input>
+					<input placeholder="请输入四级成绩" bindinput="bindGrade4" bindblur="grade4Blur" value="{{grade_4}}" type="text"></input>
 				</view>
 			</form>
 

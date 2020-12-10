@@ -670,6 +670,15 @@ Page({
       grade_point: e.detail.value
     })
   },
+  gradePointBlur: function (e) {
+    if (e.detail.value < 3.4) {
+      wx.showToast({
+        title: '必修绩点须大于3.4，否则必须填写4上传特长证明材料',
+        icon: 'none',
+        duration: 1500
+      })
+    }
+  },
 
   // 四级成绩
   chooseGrade4Img() {
@@ -686,12 +695,13 @@ Page({
     //   }
     // });
     var that = this;
-    wx.chooseMessageFile({
+    wx.chooseImage({
       count: 1, //能选择文件的数量
-      type: 'image', //只允许上传图片
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
       success(res) {
-        var size = res.tempFiles[0].size;
-        var filename = res.tempFiles[0].name + "";
+        var size = res.tempFilePaths[0].size;
+        var filename = res.tempFilePaths[0];
         var filetype = "";
         console.log(filename);
         if (size > 4194304) { //限制文件的大小
@@ -752,6 +762,15 @@ Page({
       grade_4: e.detail.value
     })
   },
+  grade4Blur: function (e) {
+    if (e.detail.value <= 525) {
+      wx.showToast({
+        title: '四级成绩须525以上，否则必须填写4上传特长证明材料',
+        icon: 'none',
+        duration: 1500
+      })
+    }
+  },
 
   // 其他证明材料
   chooseOtherMaterialImg() {
@@ -776,13 +795,14 @@ Page({
     // });
     var that = this;
     var num = 0;
-    wx.chooseMessageFile({
+    wx.chooseImage({
       count: 4, //能选择文件的数量
-      type: 'image', //只允许上传图片
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
       success(res) {
         while (res.tempFiles[num] != undefined) {
-          var size = res.tempFiles[num].size;
-          var filename = res.tempFiles[num].name + "";
+          var size = res.tempFilePaths[num].size;
+          var filename = res.tempFilePaths[num];
           if (size > 4194304) { //限制文件的大小
             wx.showToast({
               title: '文件不超过4MB',
@@ -866,13 +886,14 @@ Page({
     // });
     var that = this;
     var num = 0;
-    wx.chooseMessageFile({
+    wx.chooseImage({
       count: 4, //能选择文件的数量
-      type: 'image', //只允许上传图片
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
       success(res) {
         while (res.tempFiles[num] != undefined) {
-          var size = res.tempFiles[num].size;
-          var filename = res.tempFiles[num].name + "";
+          var size = res.tempFilePaths[num].size;
+          var filename = res.tempFilePaths[num];
           console.log(filename);
           if (size > 4194304) { //限制文件的大小
             wx.showToast({
