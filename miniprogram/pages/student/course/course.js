@@ -2,7 +2,7 @@ const app = getApp()
 Page({
   data: {
     // 页面切换
-    step: 1,
+    step: 3,
 
     //用户识别
     openid: '',
@@ -398,10 +398,10 @@ Page({
     }).get().then(res => {
       data = res.data
     })
-    if (!data) {
-      console.log("无当前学生记录")
-    } else {
-      setTimeout(function () {
+    setTimeout(function () {
+      if (!data[0]) {
+        console.log("无记录")
+      } else {
         console.log(data[0])
         that.setData({
           student_name: data[0].student_name,
@@ -415,8 +415,8 @@ Page({
           graduation_choice: data[0].graduation_choice,
           if_will_doctor: data[0].if_will_doctor
         })
-      }, 500)
-    }
+      }
+    }, 500)
   },
 
   //判断页面一是否完成
@@ -1172,6 +1172,11 @@ Page({
       console.log("不满足提交条件")
       return
     } else {
+      wx.showToast({
+        title: '正在提交',
+        icon: 'none',
+        duration: 1000
+      })
       var openID = this.data.openid
       //原页面删除
       wx.cloud.callFunction({
